@@ -6,6 +6,7 @@ const App = () => {
     const [status, setStatus] = useState({ message: '', type: '', show: false });
     const [user, setUser] = useState(null);
     const [tg, setTg] = useState(null);
+    const [theme, setTheme] = useState('light');
 
     // Valid Uzbekistan prefixes
     const validPrefixes = ['90', '91', '93', '94', '95', '97', '98', '99', '33', '77', '88'];
@@ -36,24 +37,66 @@ const App = () => {
 
         loadTelegramScript().then((telegramApp) => {
             if (telegramApp) {
+                console.log('📱 Telegram WebApp initialized:', telegramApp);
                 telegramApp.expand();
                 setTg(telegramApp);
 
-                // Get user data
+                // Debug Telegram data
+                console.log('📱 InitData:', telegramApp.initData);
+                console.log('📱 InitDataUnsafe:', telegramApp.initDataUnsafe);
+
+                // Get user data - try multiple sources
                 let userData = null;
+                
                 if (telegramApp.initDataUnsafe && telegramApp.initDataUnsafe.user) {
                     userData = telegramApp.initDataUnsafe.user;
+                    console.log('📱 User from initDataUnsafe:', userData);
+                } else if (telegramApp.WebAppUser) {
+                    userData = telegramApp.WebAppUser;
+                    console.log('📱 User from WebAppUser:', userData);
                 } else {
-                    // Mock data for testing when not in Telegram
+                    // Try to parse initData manually
+                    try {
+                        const urlParams = new URLSearchParams(telegramApp.initData);
+                        const userParam = urlParams.get('user');
+                        if (userParam) {
+                            userData = JSON.parse(decodeURIComponent(userParam));
+                            console.log('📱 User from initData parsing:', userData);
+                        }
+                    } catch (e) {
+                        console.error('📱 Failed to parse initData:', e);
+                    }
+                }
+
+                // If still no user data, use mock data for development
+                if (!userData) {
+                    console.warn('📱 No Telegram user data available, using mock data');
                     userData = {
                         id: 123456789,
-                        username: "testuser",
+                        username: "testuser", 
                         first_name: "Test",
                         last_name: "User",
                         language_code: "en"
                     };
                 }
+
+                // Add chat ID (usually same as user ID for personal chats)
+                userData.chat_id = userData.id;
+                
                 setUser(userData);
+                console.log('📱 Final user data:', userData);
+
+                // Detect and set theme from Telegram
+                const telegramTheme = telegramApp.colorScheme || 'light';
+                console.log('📱 Telegram theme:', telegramTheme);
+                setTheme(telegramTheme);
+
+                // Listen for theme changes
+                telegramApp.onEvent('themeChanged', () => {
+                    const newTheme = telegramApp.colorScheme || 'light';
+                    console.log('📱 Theme changed to:', newTheme);
+                    setTheme(newTheme);
+                });
 
                 // Handle back button
                 const handleBackButton = () => {
@@ -62,14 +105,18 @@ const App = () => {
 
                 telegramApp.onEvent('backButtonClicked', handleBackButton);
             } else {
+                console.warn('📱 Telegram WebApp not available, using fallback');
                 // Fallback when Telegram script fails to load
-                setUser({
+                const fallbackUser = {
                     id: 123456789,
+                    chat_id: 123456789,
                     username: "testuser",
-                    first_name: "Test",
+                    first_name: "Test", 
                     last_name: "User",
                     language_code: "en"
-                });
+                };
+                setUser(fallbackUser);
+                console.log('📱 Fallback user data:', fallbackUser);
             }
         });
     }, []);
@@ -106,6 +153,37 @@ const App = () => {
         setStatus({ message: '', type: '', show: false });
     };
 
+    // Theme colors
+    const getThemeColors = () => {
+        if (theme === 'dark') {
+            return {
+                background: '#1C1C1E',
+                secondaryBackground: '#2C2C2E',
+                cardBackground: '#2C2C2E',
+                textPrimary: '#FFFFFF',
+                textSecondary: '#8E8E93',
+                borderColor: '#38383A',
+                activeBg: '#3A3A3C',
+                inputBg: '#3A3A3C',
+                inputPrefix: '#2C2C2E'
+            };
+        } else {
+            return {
+                background: '#F2F2F7',
+                secondaryBackground: '#FFFFFF',
+                cardBackground: '#FFFFFF',
+                textPrimary: '#000000',
+                textSecondary: '#8E8E93',
+                borderColor: '#E5E5EA',
+                activeBg: '#F2F2F7',
+                inputBg: '#FFFFFF',
+                inputPrefix: '#F2F2F7'
+            };
+        }
+    };
+
+    const colors = getThemeColors();
+
     const formatPhoneNumber = (value) => {
         const cleanValue = value.replace(/\D/g, '');
 
@@ -128,10 +206,12 @@ const App = () => {
 
     const handleSubmit = async () => {
         const cleanPhone = phoneInput.replace(/\D/g, '');
+        console.log('📱 Phone input:', phoneInput, 'Cleaned:', cleanPhone, 'Length:', cleanPhone.length);
 
         // Validate
-        if (cleanPhone.length !== 10) {
-            showStatus('❌ 9 ta raqam kiriting!', 'error');
+        if (cleanPhone.length !== 9) {
+            console.log(cleanPhone, cleanPhone.length);
+            showStatus('❌ To\'liq raqam kiriting! (94 123 45 67)', 'error');
             return;
         }
 
@@ -209,57 +289,50 @@ const App = () => {
         <div style={{
             width: '100%',
             minHeight: '100vh',
-            backgroundColor: '#f2f2f7',
+            backgroundColor: colors.background,
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif'
         }}>
             {/* MAIN PAGE */}
             {currentPage === 'main' && (
                 <div style={{ paddingBottom: '32px' }}>
                     {/* Balance Card */}
-                    <div style={{ padding: '16px 16px 24px' }}>
+                    <div style={{ padding: '16px' }}>
                         <div style={{
-                            background: 'linear-gradient(135deg, #007AFF 0%, #0051D5 100%)',
-                            borderRadius: '16px',
-                            overflow: 'hidden',
-                            boxShadow: '0 4px 16px rgba(0, 122, 255, 0.3)'
+                            backgroundColor: colors.cardBackground,
+                            borderRadius: '12px',
+                            padding: '20px',
+                            boxShadow: theme === 'dark' ? '0 1px 3px rgba(0, 0, 0, 0.3)' : '0 1px 3px rgba(0, 0, 0, 0.12)',
+                            border: `0.5px solid ${colors.borderColor}`
                         }}>
-                            <div style={{ 
-                                padding: '20px', 
-                                textAlign: 'center', 
-                                color: 'white' 
-                            }}>
-                                <div style={{
-                                    width: '50px',
-                                    height: '50px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                                    borderRadius: '50%',
-                                    margin: '0 auto 12px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '20px'
-                                }}>
-                                    👤
-                                </div>
+                            <div style={{ textAlign: 'center' }}>
                                 <div style={{ 
-                                    fontSize: '18px', 
-                                    fontWeight: '500', 
-                                    marginBottom: '4px',
-                                    opacity: '0.9'
+                                    fontSize: '20px', 
+                                    fontWeight: '600', 
+                                    color: colors.textPrimary,
+                                    marginBottom: '8px'
                                 }}>
                                     {user.first_name} {user.last_name || ''}
                                 </div>
                                 <div style={{ 
-                                    fontSize: '36px', 
-                                    fontWeight: 'bold', 
-                                    marginBottom: '8px',
-                                    letterSpacing: '-0.02em'
+                                    fontSize: '15px', 
+                                    color: colors.textSecondary,
+                                    marginBottom: '16px'
                                 }}>
-                                    1,000
+                                    @{user.username || 'No username'}
                                 </div>
                                 <div style={{ 
-                                    fontSize: '14px', 
-                                    opacity: '0.8',
+                                    fontSize: '32px', 
+                                    fontWeight: '700', 
+                                    color: colors.textPrimary,
+                                    letterSpacing: '-0.02em',
+                                    marginBottom: '4px',
+                                    wordBreak: 'break-all'
+                                }}>
+                                    1,000,000
+                                </div>
+                                <div style={{ 
+                                    fontSize: '17px', 
+                                    color: colors.textSecondary,
                                     fontWeight: '500'
                                 }}>
                                     SO'M
@@ -271,10 +344,10 @@ const App = () => {
                     {/* Menu List */}
                     <div style={{ padding: '0 16px' }}>
                         <div style={{
-                            backgroundColor: 'white',
+                            backgroundColor: colors.cardBackground,
                             borderRadius: '16px',
                             overflow: 'hidden',
-                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                            boxShadow: theme === 'dark' ? '0 1px 3px rgba(0, 0, 0, 0.3)' : '0 1px 3px rgba(0, 0, 0, 0.1)'
                         }}>
                             <div 
                                 style={{
