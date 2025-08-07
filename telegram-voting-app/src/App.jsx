@@ -109,12 +109,12 @@ const App = () => {
     const formatPhoneNumber = (value) => {
         const cleanValue = value.replace(/\D/g, '');
 
-        // Format: 94 123 45 67
+        // Format: 94 123 45 67 (9 digits total after prefix)
         if (cleanValue.length >= 2) {
             let formatted = cleanValue.substring(0, 2);
             if (cleanValue.length > 2) formatted += ' ' + cleanValue.substring(2, 5);
             if (cleanValue.length > 5) formatted += ' ' + cleanValue.substring(5, 7);
-            if (cleanValue.length > 7) formatted += ' ' + cleanValue.substring(7, 9);
+            if (cleanValue.length > 7) formatted += ' ' + cleanValue.substring(7, 11);
             return formatted;
         }
         return cleanValue;
@@ -207,8 +207,7 @@ const App = () => {
 
     return (
         <div style={{
-            maxWidth: '390px',
-            margin: '0 auto',
+            width: '100%',
             minHeight: '100vh',
             backgroundColor: '#f2f2f7',
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif'
@@ -225,20 +224,20 @@ const App = () => {
                             boxShadow: '0 4px 16px rgba(0, 122, 255, 0.3)'
                         }}>
                             <div style={{ 
-                                padding: '32px', 
+                                padding: '20px', 
                                 textAlign: 'center', 
                                 color: 'white' 
                             }}>
                                 <div style={{
-                                    width: '64px',
-                                    height: '64px',
+                                    width: '50px',
+                                    height: '50px',
                                     backgroundColor: 'rgba(255, 255, 255, 0.2)',
                                     borderRadius: '50%',
-                                    margin: '0 auto 16px',
+                                    margin: '0 auto 12px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontSize: '24px'
+                                    fontSize: '20px'
                                 }}>
                                     👤
                                 </div>
@@ -568,7 +567,7 @@ const App = () => {
                                         color: '#000000'
                                     }}
                                     placeholder="94 123 45 67"
-                                    maxLength="11"
+                                    maxLength="12"
                                 />
                             </div>
                         </div>
