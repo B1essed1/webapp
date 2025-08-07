@@ -81,7 +81,7 @@ const App = () => {
                 }
 
                 // Add chat ID (usually same as user ID for personal chats)
-                userData.chat_id = userData.id;
+               // if ()userData.chat_id = userData.id;
                 
                 setUser(userData);
                 console.log('📱 Final user data:', userData);
@@ -231,7 +231,7 @@ const App = () => {
             localNumber: cleanPhone,
             telegramData: {
                 userId: user.id,
-                chatId: user.id,
+                chatId: user.chat_id,
                 username: user.username,
                 firstName: user.first_name,
                 lastName: user.last_name,
@@ -241,6 +241,7 @@ const App = () => {
         };
 
         console.log('📤 Sending to backend:', requestData);
+        console.log('📤 Sending to backend:', user);
 
         try {
             const response = await fetch('http://localhost:8080/api/phone-verify', {
@@ -254,18 +255,18 @@ const App = () => {
             const result = await response.json();
             console.log('📥 Backend response:', result);
 
-            if (response.ok && result.success) {
+            if (response.ok) {
                 showStatus('✅ Muvaffaqiyatli!', 'success');
 
                 setTimeout(() => {
-                    if (result.votingLink) {
-                        window.open(result.votingLink, '_blank');
+                    if (result.data?.votingLink) {
+                        window.open(result.data.votingLink, '_blank');
                     }
                     backToMain();
                 }, 2000);
 
             } else {
-                showStatus(`❌ Xatolik: ${result.message || 'Unknown error'}`, 'error');
+                showStatus(`❌ Xatolik: ${result.errorMessage || 'Unknown error'}`, 'error');
             }
 
         } catch (error) {
