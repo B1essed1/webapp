@@ -196,198 +196,459 @@ const App = () => {
 
     if (!user) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-100">
+            <div className="flex items-center justify-center min-h-screen bg-gray-50">
                 <div className="text-center p-8">
-                    <div className="text-lg font-semibold text-gray-700 mb-2">Loading Telegram App...</div>
-                    <div className="animate-spin h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto"></div>
+                    <div className="w-12 h-12 border-3 border-gray-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+                    <div className="text-lg font-medium text-gray-700">Loading...</div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="max-w-md mx-auto bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
-            {/* DEBUG INFO */}
-            <div className="bg-black bg-opacity-5 backdrop-blur-sm p-3 text-xs font-mono border-b border-white border-opacity-20 text-gray-700">
-                🔧 DEBUG:<br/>
-                User ID: {user.id}<br/>
-                Username: {user.username || 'No username'}<br/>
-                API: http://localhost:8080/api
-            </div>
-
+        <div style={{
+            maxWidth: '390px',
+            margin: '0 auto',
+            minHeight: '100vh',
+            backgroundColor: '#f2f2f7',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif'
+        }}>
             {/* MAIN PAGE */}
             {currentPage === 'main' && (
-                <div className="pb-8">
-                    {/* Header Card */}
-                    <div className="mx-4 mt-6 mb-6 bg-white bg-opacity-60 backdrop-blur-xl rounded-3xl shadow-xl border border-white border-opacity-30 overflow-hidden">
-                        <div className="bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-8 text-white relative">
-                            <div className="absolute inset-0 bg-black bg-opacity-10"></div>
-                            <div className="relative z-10 text-center">
-                                <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl backdrop-blur-sm">
+                <div style={{ paddingBottom: '32px' }}>
+                    {/* Balance Card */}
+                    <div style={{ padding: '16px 16px 24px' }}>
+                        <div style={{
+                            background: 'linear-gradient(135deg, #007AFF 0%, #0051D5 100%)',
+                            borderRadius: '16px',
+                            overflow: 'hidden',
+                            boxShadow: '0 4px 16px rgba(0, 122, 255, 0.3)'
+                        }}>
+                            <div style={{ 
+                                padding: '32px', 
+                                textAlign: 'center', 
+                                color: 'white' 
+                            }}>
+                                <div style={{
+                                    width: '64px',
+                                    height: '64px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                    borderRadius: '50%',
+                                    margin: '0 auto 16px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '24px'
+                                }}>
                                     👤
                                 </div>
-                                <div className="text-lg font-medium mb-1 opacity-90">
+                                <div style={{ 
+                                    fontSize: '18px', 
+                                    fontWeight: '500', 
+                                    marginBottom: '4px',
+                                    opacity: '0.9'
+                                }}>
                                     {user.first_name} {user.last_name || ''}
                                 </div>
-                                <div className="text-4xl font-bold mb-2 tracking-tight">1,000</div>
-                                <div className="text-sm opacity-80 font-medium">SO'M • Balans</div>
+                                <div style={{ 
+                                    fontSize: '36px', 
+                                    fontWeight: 'bold', 
+                                    marginBottom: '8px',
+                                    letterSpacing: '-0.02em'
+                                }}>
+                                    1,000
+                                </div>
+                                <div style={{ 
+                                    fontSize: '14px', 
+                                    opacity: '0.8',
+                                    fontWeight: '500'
+                                }}>
+                                    SO'M
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Menu Cards */}
-                    <div className="px-4 space-y-4">
-                        <button
-                            onClick={openPhonePage}
-                            className="w-full bg-white bg-opacity-70 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-white border-opacity-50 hover:bg-opacity-80 transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95"
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-4">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-xl flex items-center justify-center text-white text-xl shadow-lg">
-                                        🗳
+                    {/* Menu List */}
+                    <div style={{ padding: '0 16px' }}>
+                        <div style={{
+                            backgroundColor: 'white',
+                            borderRadius: '16px',
+                            overflow: 'hidden',
+                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                        }}>
+                            <div 
+                                style={{
+                                    padding: '16px 20px',
+                                    borderBottom: '0.5px solid #E5E5EA',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    cursor: 'pointer',
+                                    transition: 'background-color 0.1s ease'
+                                }}
+                                onClick={openPhonePage}
+                                onTouchStart={(e) => e.currentTarget.style.backgroundColor = '#f2f2f7'}
+                                onTouchEnd={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <div style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        backgroundColor: '#007AFF',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '18px',
+                                        marginRight: '16px'
+                                    }}>
+                                        🗳️
                                     </div>
-                                    <div className="text-left">
-                                        <div className="font-semibold text-gray-800 text-lg">Ovoz berish</div>
-                                        <div className="text-gray-500 text-sm">Saylovda ishtirok eting</div>
+                                    <div>
+                                        <div style={{ 
+                                            fontWeight: '600', 
+                                            color: '#000000',
+                                            fontSize: '17px'
+                                        }}>
+                                            Ovoz berish
+                                        </div>
+                                        <div style={{ 
+                                            fontSize: '15px', 
+                                            color: '#8E8E93',
+                                            marginTop: '2px'
+                                        }}>
+                                            Saylovda ishtirok eting
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                                    <span className="text-gray-600">→</span>
+                                <div style={{ 
+                                    color: '#C7C7CC', 
+                                    fontSize: '20px',
+                                    fontWeight: '400'
+                                }}>
+                                    ›
                                 </div>
                             </div>
-                        </button>
-
-                        <button
-                            onClick={comingSoon}
-                            className="w-full bg-white bg-opacity-70 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-white border-opacity-50 hover:bg-opacity-80 transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95"
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-4">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center text-white text-xl shadow-lg">
+                            
+                            <div 
+                                style={{
+                                    padding: '16px 20px',
+                                    borderBottom: '0.5px solid #E5E5EA',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={comingSoon}
+                                onTouchStart={(e) => e.currentTarget.style.backgroundColor = '#f2f2f7'}
+                                onTouchEnd={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <div style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        backgroundColor: '#AF52DE',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '18px',
+                                        marginRight: '16px'
+                                    }}>
                                         📊
                                     </div>
-                                    <div className="text-left">
-                                        <div className="font-semibold text-gray-800 text-lg">Natijalar</div>
-                                        <div className="text-gray-500 text-sm">Saylov natijalarini ko'ring</div>
+                                    <div>
+                                        <div style={{ 
+                                            fontWeight: '600', 
+                                            color: '#000000',
+                                            fontSize: '17px'
+                                        }}>
+                                            Natijalar
+                                        </div>
+                                        <div style={{ 
+                                            fontSize: '15px', 
+                                            color: '#8E8E93',
+                                            marginTop: '2px'
+                                        }}>
+                                            Saylov natijalarini ko'ring
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                                    <span className="text-gray-600">→</span>
-                                </div>
+                                <div style={{ color: '#C7C7CC', fontSize: '20px' }}>›</div>
                             </div>
-                        </button>
-
-                        <button
-                            onClick={comingSoon}
-                            className="w-full bg-white bg-opacity-70 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-white border-opacity-50 hover:bg-opacity-80 transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95"
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-4">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center text-white text-xl shadow-lg">
+                            
+                            <div 
+                                style={{
+                                    padding: '16px 20px',
+                                    borderBottom: '0.5px solid #E5E5EA',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={comingSoon}
+                                onTouchStart={(e) => e.currentTarget.style.backgroundColor = '#f2f2f7'}
+                                onTouchEnd={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <div style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        backgroundColor: '#FF9500',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '18px',
+                                        marginRight: '16px'
+                                    }}>
                                         💳
                                     </div>
-                                    <div className="text-left">
-                                        <div className="font-semibold text-gray-800 text-lg">To'lovlar tarixi</div>
-                                        <div className="text-gray-500 text-sm">Barcha tranzaksiyalar</div>
+                                    <div>
+                                        <div style={{ 
+                                            fontWeight: '600', 
+                                            color: '#000000',
+                                            fontSize: '17px'
+                                        }}>
+                                            To'lovlar tarixi
+                                        </div>
+                                        <div style={{ 
+                                            fontSize: '15px', 
+                                            color: '#8E8E93',
+                                            marginTop: '2px'
+                                        }}>
+                                            Barcha tranzaksiyalar
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                                    <span className="text-gray-600">→</span>
-                                </div>
+                                <div style={{ color: '#C7C7CC', fontSize: '20px' }}>›</div>
                             </div>
-                        </button>
-
-                        <button
-                            onClick={comingSoon}
-                            className="w-full bg-white bg-opacity-70 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-white border-opacity-50 hover:bg-opacity-80 transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95"
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-4">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-teal-500 rounded-xl flex items-center justify-center text-white text-xl shadow-lg">
+                            
+                            <div 
+                                style={{
+                                    padding: '16px 20px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={comingSoon}
+                                onTouchStart={(e) => e.currentTarget.style.backgroundColor = '#f2f2f7'}
+                                onTouchEnd={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <div style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        backgroundColor: '#5AC8FA',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '18px',
+                                        marginRight: '16px'
+                                    }}>
                                         🔗
                                     </div>
-                                    <div className="text-left">
-                                        <div className="font-semibold text-gray-800 text-lg">Referal ssylka</div>
-                                        <div className="text-gray-500 text-sm">Do'stlarni taklif qiling</div>
+                                    <div>
+                                        <div style={{ 
+                                            fontWeight: '600', 
+                                            color: '#000000',
+                                            fontSize: '17px'
+                                        }}>
+                                            Referal ssylka
+                                        </div>
+                                        <div style={{ 
+                                            fontSize: '15px', 
+                                            color: '#8E8E93',
+                                            marginTop: '2px'
+                                        }}>
+                                            Do'stlarni taklif qiling
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                                    <span className="text-gray-600">→</span>
-                                </div>
+                                <div style={{ color: '#C7C7CC', fontSize: '20px' }}>›</div>
                             </div>
-                        </button>
+                        </div>
+                    </div>
+
+                    {/* Debug Info */}
+                    <div style={{ padding: '24px 16px 0' }}>
+                        <div style={{
+                            backgroundColor: 'rgba(118, 118, 128, 0.12)',
+                            borderRadius: '16px',
+                            padding: '16px'
+                        }}>
+                            <div style={{ 
+                                fontSize: '12px', 
+                                fontFamily: 'SF Mono, Monaco, monospace',
+                                color: '#8E8E93',
+                                lineHeight: '1.6'
+                            }}>
+                                <div>🔧 DEBUG</div>
+                                <div>User ID: {user.id}</div>
+                                <div>Username: {user.username || 'No username'}</div>
+                                <div>API: http://localhost:8080/api</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
 
             {/* PHONE PAGE */}
             {currentPage === 'phone' && (
-                <div className="p-6">
+                <div style={{ padding: '16px 16px 24px' }}>
                     {/* Header */}
-                    <div className="text-center mb-8 mt-4">
-                        <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl shadow-xl">
+                    <div style={{ textAlign: 'center', marginBottom: '32px', paddingTop: '16px' }}>
+                        <div style={{
+                            width: '80px',
+                            height: '80px',
+                            backgroundColor: '#007AFF',
+                            borderRadius: '50%',
+                            margin: '0 auto 16px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '36px'
+                        }}>
                             📱
                         </div>
-                        <div className="text-2xl font-bold text-gray-800 mb-2">
+                        <h1 style={{ 
+                            fontSize: '28px', 
+                            fontWeight: 'bold', 
+                            color: '#000000', 
+                            marginBottom: '8px',
+                            margin: '0 0 8px 0'
+                        }}>
                             Telefon raqami
-                        </div>
-                        <p className="text-gray-600 px-4">
+                        </h1>
+                        <p style={{ 
+                            fontSize: '17px',
+                            color: '#8E8E93',
+                            margin: '0',
+                            padding: '0 16px'
+                        }}>
                             O'zbekiston telefon raqamingizni kiriting
                         </p>
                     </div>
 
-                    <div className="space-y-6">
-                        {/* Phone Input Card */}
-                        <div className="bg-white bg-opacity-80 backdrop-blur-xl rounded-2xl shadow-xl border border-white border-opacity-50 overflow-hidden">
-                            <div className="flex">
-                                <div className="px-6 py-5 bg-gray-50 bg-opacity-50 font-mono font-bold border-r border-gray-200 border-opacity-50 text-gray-700">
+                    {/* Phone Input */}
+                    <div style={{ marginBottom: '24px' }}>
+                        <div style={{
+                            backgroundColor: 'white',
+                            borderRadius: '16px',
+                            overflow: 'hidden',
+                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                        }}>
+                            <div style={{ display: 'flex' }}>
+                                <div style={{
+                                    padding: '16px 16px',
+                                    backgroundColor: '#F2F2F7',
+                                    fontFamily: 'SF Mono, Monaco, monospace',
+                                    fontWeight: '600',
+                                    borderRight: '1px solid #E5E5EA',
+                                    color: '#3A3A3C',
+                                    fontSize: '17px'
+                                }}>
                                     +998
                                 </div>
                                 <input
                                     type="tel"
                                     value={phoneInput}
                                     onChange={handlePhoneInput}
-                                    className="flex-1 px-6 py-5 font-mono text-lg outline-none bg-transparent placeholder-gray-400"
+                                    style={{
+                                        flex: '1',
+                                        padding: '16px',
+                                        fontFamily: 'SF Mono, Monaco, monospace',
+                                        fontSize: '17px',
+                                        border: 'none',
+                                        outline: 'none',
+                                        backgroundColor: 'white',
+                                        color: '#000000'
+                                    }}
                                     placeholder="94 123 45 67"
                                     maxLength="11"
-                                    required
                                 />
                             </div>
                         </div>
+                    </div>
 
-                        {/* Status Message */}
-                        {status.show && (
-                            <div className={`p-5 rounded-2xl text-center font-medium backdrop-blur-xl border border-opacity-30 ${
-                                status.type === 'success' ? 'bg-green-100 bg-opacity-80 text-green-800 border-green-200' :
-                                    status.type === 'error' ? 'bg-red-100 bg-opacity-80 text-red-800 border-red-200' :
-                                        'bg-blue-100 bg-opacity-80 text-blue-800 border-blue-200'
-                            }`}>
-                                {status.message}
-                            </div>
-                        )}
-
-                        {/* Action Buttons */}
-                        <div className="space-y-4 pt-4">
-                            <button
-                                onClick={handleSubmit}
-                                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white p-5 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
-                            >
-                                <div className="flex items-center justify-center space-x-2">
-                                    <span>✅</span>
-                                    <span>Tasdiqlash</span>
-                                </div>
-                            </button>
-
-                            <button
-                                onClick={backToMain}
-                                className="w-full bg-white bg-opacity-80 backdrop-blur-xl text-gray-700 p-5 rounded-2xl font-semibold border border-gray-200 border-opacity-50 shadow-lg hover:bg-opacity-90 transition-all duration-300 hover:scale-105 active:scale-95"
-                            >
-                                <div className="flex items-center justify-center space-x-2">
-                                    <span>←</span>
-                                    <span>Orqaga</span>
-                                </div>
-                            </button>
+                    {/* Status Message */}
+                    {status.show && (
+                        <div style={{
+                            marginBottom: '24px',
+                            padding: '16px',
+                            borderRadius: '16px',
+                            textAlign: 'center',
+                            fontWeight: '500',
+                            fontSize: '15px',
+                            backgroundColor: status.type === 'success' ? '#D1F2EB' : 
+                                           status.type === 'error' ? '#FADBD8' : '#EBF5FF',
+                            color: status.type === 'success' ? '#0E7245' : 
+                                   status.type === 'error' ? '#B03A2E' : '#1B4F72'
+                        }}>
+                            {status.message}
                         </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <button
+                            onClick={handleSubmit}
+                            style={{
+                                backgroundColor: '#007AFF',
+                                border: 'none',
+                                borderRadius: '14px',
+                                color: 'white',
+                                fontFamily: 'inherit',
+                                fontWeight: '600',
+                                fontSize: '17px',
+                                padding: '17px 20px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                outline: 'none',
+                                width: '100%'
+                            }}
+                            onTouchStart={(e) => {
+                                e.currentTarget.style.transform = 'scale(0.96)';
+                                e.currentTarget.style.opacity = '0.8';
+                            }}
+                            onTouchEnd={(e) => {
+                                e.currentTarget.style.transform = 'scale(1)';
+                                e.currentTarget.style.opacity = '1';
+                            }}
+                        >
+                            ✅ Tasdiqlash
+                        </button>
+
+                        <button
+                            onClick={backToMain}
+                            style={{
+                                backgroundColor: '#F2F2F7',
+                                border: 'none',
+                                borderRadius: '14px',
+                                color: '#007AFF',
+                                fontFamily: 'inherit',
+                                fontWeight: '600',
+                                fontSize: '17px',
+                                padding: '17px 20px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                outline: 'none',
+                                width: '100%'
+                            }}
+                            onTouchStart={(e) => {
+                                e.currentTarget.style.transform = 'scale(0.96)';
+                                e.currentTarget.style.opacity = '0.8';
+                            }}
+                            onTouchEnd={(e) => {
+                                e.currentTarget.style.transform = 'scale(1)';
+                                e.currentTarget.style.opacity = '1';
+                            }}
+                        >
+                            ← Orqaga
+                        </button>
                     </div>
                 </div>
             )}
