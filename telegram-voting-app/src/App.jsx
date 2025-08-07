@@ -157,15 +157,15 @@ const App = () => {
     const getThemeColors = () => {
         if (theme === 'dark') {
             return {
-                background: '#1C1C1E',
-                secondaryBackground: '#2C2C2E',
-                cardBackground: '#2C2C2E',
-                textPrimary: '#FFFFFF',
-                textSecondary: '#8E8E93',
-                borderColor: '#38383A',
-                activeBg: '#3A3A3C',
-                inputBg: '#3A3A3C',
-                inputPrefix: '#2C2C2E'
+                background: '#0F0F0F',          // Softer, warmer dark
+                secondaryBackground: '#1A1A1A', // Less harsh gray
+                cardBackground: '#1E1E1E',      // Warm dark card
+                textPrimary: '#E8E8E8',         // Softer white, easier on eyes
+                textSecondary: '#A0A0A5',       // Warmer gray text
+                borderColor: '#2D2D30',         // Subtle borders
+                activeBg: '#2A2A2A',            // Gentle highlight
+                inputBg: '#1E1E1E',             // Consistent with cards
+                inputPrefix: '#2A2A2A'          // Slightly lighter prefix
             };
         } else {
             return {
@@ -352,7 +352,7 @@ const App = () => {
                             <div 
                                 style={{
                                     padding: '16px 20px',
-                                    borderBottom: '0.5px solid #E5E5EA',
+                                    borderBottom: `0.5px solid ${colors.borderColor}`,
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'space-between',
@@ -360,8 +360,8 @@ const App = () => {
                                     transition: 'background-color 0.1s ease'
                                 }}
                                 onClick={openPhonePage}
-                                onTouchStart={(e) => e.currentTarget.style.backgroundColor = '#f2f2f7'}
-                                onTouchEnd={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                onTouchStart={(e) => e.currentTarget.style.backgroundColor = colors.activeBg}
+                                onTouchEnd={(e) => e.currentTarget.style.backgroundColor = colors.cardBackground}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <div style={{
@@ -380,14 +380,14 @@ const App = () => {
                                     <div>
                                         <div style={{ 
                                             fontWeight: '600', 
-                                            color: '#000000',
+                                            color: colors.textPrimary,
                                             fontSize: '17px'
                                         }}>
                                             Ovoz berish
                                         </div>
                                         <div style={{ 
                                             fontSize: '15px', 
-                                            color: '#8E8E93',
+                                            color: colors.textSecondary,
                                             marginTop: '2px'
                                         }}>
                                             Saylovda ishtirok eting
@@ -395,7 +395,7 @@ const App = () => {
                                     </div>
                                 </div>
                                 <div style={{ 
-                                    color: '#C7C7CC', 
+                                    color: colors.textSecondary, 
                                     fontSize: '20px',
                                     fontWeight: '400'
                                 }}>
@@ -406,15 +406,15 @@ const App = () => {
                             <div 
                                 style={{
                                     padding: '16px 20px',
-                                    borderBottom: '0.5px solid #E5E5EA',
+                                    borderBottom: `0.5px solid ${colors.borderColor}`,
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'space-between',
                                     cursor: 'pointer'
                                 }}
                                 onClick={comingSoon}
-                                onTouchStart={(e) => e.currentTarget.style.backgroundColor = '#f2f2f7'}
-                                onTouchEnd={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                onTouchStart={(e) => e.currentTarget.style.backgroundColor = colors.activeBg}
+                                onTouchEnd={(e) => e.currentTarget.style.backgroundColor = colors.cardBackground}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <div style={{
@@ -433,14 +433,14 @@ const App = () => {
                                     <div>
                                         <div style={{ 
                                             fontWeight: '600', 
-                                            color: '#000000',
+                                            color: colors.textPrimary,
                                             fontSize: '17px'
                                         }}>
                                             Natijalar
                                         </div>
                                         <div style={{ 
                                             fontSize: '15px', 
-                                            color: '#8E8E93',
+                                            color: colors.textSecondary,
                                             marginTop: '2px'
                                         }}>
                                             Saylov natijalarini ko'ring
@@ -453,15 +453,15 @@ const App = () => {
                             <div 
                                 style={{
                                     padding: '16px 20px',
-                                    borderBottom: '0.5px solid #E5E5EA',
+                                    borderBottom: `0.5px solid ${colors.borderColor}`,
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'space-between',
                                     cursor: 'pointer'
                                 }}
                                 onClick={comingSoon}
-                                onTouchStart={(e) => e.currentTarget.style.backgroundColor = '#f2f2f7'}
-                                onTouchEnd={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                onTouchStart={(e) => e.currentTarget.style.backgroundColor = colors.activeBg}
+                                onTouchEnd={(e) => e.currentTarget.style.backgroundColor = colors.cardBackground}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <div style={{
@@ -480,14 +480,14 @@ const App = () => {
                                     <div>
                                         <div style={{ 
                                             fontWeight: '600', 
-                                            color: '#000000',
+                                            color: colors.textPrimary,
                                             fontSize: '17px'
                                         }}>
                                             To'lovlar tarixi
                                         </div>
                                         <div style={{ 
                                             fontSize: '15px', 
-                                            color: '#8E8E93',
+                                            color: colors.textSecondary,
                                             marginTop: '2px'
                                         }}>
                                             Barcha tranzaksiyalar
@@ -506,8 +506,8 @@ const App = () => {
                                     cursor: 'pointer'
                                 }}
                                 onClick={comingSoon}
-                                onTouchStart={(e) => e.currentTarget.style.backgroundColor = '#f2f2f7'}
-                                onTouchEnd={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                onTouchStart={(e) => e.currentTarget.style.backgroundColor = colors.activeBg}
+                                onTouchEnd={(e) => e.currentTarget.style.backgroundColor = colors.cardBackground}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <div style={{
@@ -526,14 +526,14 @@ const App = () => {
                                     <div>
                                         <div style={{ 
                                             fontWeight: '600', 
-                                            color: '#000000',
+                                            color: colors.textPrimary,
                                             fontSize: '17px'
                                         }}>
                                             Referal ssylka
                                         </div>
                                         <div style={{ 
                                             fontSize: '15px', 
-                                            color: '#8E8E93',
+                                            color: colors.textSecondary,
                                             marginTop: '2px'
                                         }}>
                                             Do'stlarni taklif qiling
@@ -545,26 +545,6 @@ const App = () => {
                         </div>
                     </div>
 
-                    {/* Debug Info */}
-                    <div style={{ padding: '24px 16px 0' }}>
-                        <div style={{
-                            backgroundColor: 'rgba(118, 118, 128, 0.12)',
-                            borderRadius: '16px',
-                            padding: '16px'
-                        }}>
-                            <div style={{ 
-                                fontSize: '12px', 
-                                fontFamily: 'SF Mono, Monaco, monospace',
-                                color: '#8E8E93',
-                                lineHeight: '1.6'
-                            }}>
-                                <div>🔧 DEBUG</div>
-                                <div>User ID: {user.id}</div>
-                                <div>Username: {user.username || 'No username'}</div>
-                                <div>API: http://localhost:8080/api</div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             )}
 
