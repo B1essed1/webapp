@@ -3,10 +3,13 @@ import React, { useState, useEffect } from 'react';
 const App = () => {
     const [currentPage, setCurrentPage] = useState('main');
     const [phoneInput, setPhoneInput] = useState('');
-    const [status, setStatus] = useState({ message: '', type: '', show: false });
+    const [currentPhoneNumber, setCurrentPhoneNumber] = useState('');
+    const [status, setStatus] = useState({ message: '', type: '', show: false, url: null });
     const [user, setUser] = useState(null);
     const [tg, setTg] = useState(null);
     const [theme, setTheme] = useState('light');
+    const [balance, setBalance] = useState(0);
+    const [balanceLoading, setBalanceLoading] = useState(false);
 
     // Valid Uzbekistan prefixes
     const validPrefixes = ['90', '91', '93', '94', '95', '97', '98', '99', '33', '77', '88'];
@@ -121,6 +124,13 @@ const App = () => {
         });
     }, []);
 
+    // Fetch balance when user is available
+    useEffect(() => {
+        if (user) {
+            fetchBalance();
+        }
+    }, [user]);
+
     const openPhonePage = () => {
         setCurrentPage('phone');
         if (tg?.BackButton) {
@@ -145,12 +155,98 @@ const App = () => {
         }
     };
 
-    const showStatus = (message, type) => {
-        setStatus({ message, type, show: true });
+    const showStatus = (message, type, url = null) => {
+        setStatus({ message, type, show: true, url });
     };
 
     const hideStatus = () => {
-        setStatus({ message: '', type: '', show: false });
+        setStatus({ message: '', type: '', show: false, url: null });
+    };
+
+    const fetchBalance = async () => {
+        if (!user) return;
+        
+        setBalanceLoading(true);
+        const requestData = {
+            userId: user.id,
+            username: user.username,
+            firstName: user.first_name,
+            lastName: user.last_name,
+            languageCode: user.language_code
+        };
+
+        try {
+            const response = await fetch('https://a9689ce00a6a.ngrok-free.app/api/balance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            const result = await response.json();
+            console.log('💰 Balance response:', result);
+
+            if (response.ok && result.data?.balance !== undefined) {
+                // Convert from tiyin to sum (1 sum = 100 tiyin)
+                const balanceInSum = Math.floor(result.data.balance / 100);
+                setBalance(balanceInSum);
+            } else {
+                console.error('Failed to fetch balance:', result.errorMessage);
+                setBalance(0);
+            }
+        } catch (error) {
+            console.error('💥 Balance fetch error:', error);
+            setBalance(0);
+        } finally {
+            setBalanceLoading(false);
+        }
+    };
+
+    const updateVoteStatus = async (phoneNumber, voteStatus) => {
+        const requestData = {
+            phoneNumber: phoneNumber,
+            telegramData: {
+                userId: user.id,
+                chatId: user.chat_id,
+                username: user.username,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                languageCode: user.language_code
+            },
+            voteStatus: voteStatus
+        };
+
+        try {
+            const response = await fetch('https://a9689ce00a6a.ngrok-free.app/api/vote-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            const result = await response.json();
+            console.log('📥 Vote status update response:', result);
+
+            if (!response.ok) {
+                console.error('Failed to update vote status:', result.errorMessage);
+            }
+        } catch (error) {
+            console.error('💥 Vote status update error:', error);
+        }
+    };
+
+    const handleVotingLinkClick = () => {
+        // Update vote status to CLICKED before opening the link
+        if (currentPhoneNumber) {
+            updateVoteStatus(currentPhoneNumber, 'CLICKED');
+            // Show confirmation message after clicking
+            setTimeout(() => {
+                showStatus('✅Ovoz bergan bo\'lsangiz 40 minutdan keyin balansingizni tekshiring' , 'success');
+            }, 100);
+        }
+        // The default link behavior will still work (opening in new tab)
     };
 
     // Theme colors
@@ -244,7 +340,7 @@ const App = () => {
         console.log('📤 Sending to backend:', user);
 
         try {
-            const response = await fetch('http://localhost:8080/api/phone-verify', {
+            const response = await fetch('  https://a9689ce00a6a.ngrok-free.app/api/phone-verify', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -256,14 +352,14 @@ const App = () => {
             console.log('📥 Backend response:', result);
 
             if (response.ok) {
-                showStatus('✅ Muvaffaqiyatli!', 'success');
-
-                setTimeout(() => {
-                    if (result.data?.votingLink) {
-                        window.open(result.data.votingLink, '_blank');
-                    }
-                    backToMain();
-                }, 2000);
+                // Store the phone number for vote status updates
+                setCurrentPhoneNumber(fullPhone);
+                
+                if (result.data?.message) {
+                    showStatus('✅ Muvaffaqiyatli! Ovoz berish uchun linkni bosing', 'success', result.data.message);
+                } else {
+                    showStatus('✅ Muvaffaqiyatli!', 'success');
+                }
 
             } else {
                 showStatus(`❌ Xatolik: ${result.errorMessage || 'Unknown error'}`, 'error');
@@ -321,15 +417,44 @@ const App = () => {
                                 }}>
                                     @{user.username || 'No username'}
                                 </div>
-                                <div style={{ 
-                                    fontSize: '32px', 
-                                    fontWeight: '700', 
-                                    color: colors.textPrimary,
-                                    letterSpacing: '-0.02em',
-                                    marginBottom: '4px',
-                                    wordBreak: 'break-all'
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '12px',
+                                    marginBottom: '4px'
                                 }}>
-                                    1,000,000
+                                    <div style={{ 
+                                        fontSize: '32px', 
+                                        fontWeight: '700', 
+                                        color: colors.textPrimary,
+                                        letterSpacing: '-0.02em'
+                                    }}>
+                                        {balanceLoading ? '...' : balance.toLocaleString()}
+                                    </div>
+                                    <button
+                                        onClick={fetchBalance}
+                                        style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            fontSize: '20px',
+                                            padding: '4px',
+                                            borderRadius: '50%',
+                                            color: colors.textSecondary,
+                                            transition: 'all 0.2s ease',
+                                            opacity: balanceLoading ? 0.5 : 1
+                                        }}
+                                        disabled={balanceLoading}
+                                        onTouchStart={(e) => {
+                                            e.currentTarget.style.transform = 'scale(0.9)';
+                                        }}
+                                        onTouchEnd={(e) => {
+                                            e.currentTarget.style.transform = 'scale(1)';
+                                        }}
+                                    >
+                                        🔄
+                                    </button>
                                 </div>
                                 <div style={{ 
                                     fontSize: '17px', 
@@ -448,7 +573,7 @@ const App = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div style={{ color: '#C7C7CC', fontSize: '20px' }}>›</div>
+                                <div style={{ color: colors.textSecondary, fontSize: '20px' }}>›</div>
                             </div>
                             
                             <div 
@@ -495,7 +620,7 @@ const App = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div style={{ color: '#C7C7CC', fontSize: '20px' }}>›</div>
+                                <div style={{ color: colors.textSecondary, fontSize: '20px' }}>›</div>
                             </div>
                             
                             <div 
@@ -541,7 +666,7 @@ const App = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div style={{ color: '#C7C7CC', fontSize: '20px' }}>›</div>
+                                <div style={{ color: colors.textSecondary, fontSize: '20px' }}>›</div>
                             </div>
                         </div>
                     </div>
@@ -570,7 +695,7 @@ const App = () => {
                         <h1 style={{ 
                             fontSize: '28px', 
                             fontWeight: 'bold', 
-                            color: '#000000', 
+                            color: colors.textPrimary, 
                             marginBottom: '8px',
                             margin: '0 0 8px 0'
                         }}>
@@ -578,7 +703,7 @@ const App = () => {
                         </h1>
                         <p style={{ 
                             fontSize: '17px',
-                            color: '#8E8E93',
+                            color: colors.textSecondary,
                             margin: '0',
                             padding: '0 16px'
                         }}>
@@ -589,19 +714,20 @@ const App = () => {
                     {/* Phone Input */}
                     <div style={{ marginBottom: '24px' }}>
                         <div style={{
-                            backgroundColor: 'white',
+                            backgroundColor: colors.inputBg,
                             borderRadius: '16px',
                             overflow: 'hidden',
-                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                            boxShadow: theme === 'dark' ? '0 1px 3px rgba(0, 0, 0, 0.3)' : '0 1px 3px rgba(0, 0, 0, 0.1)',
+                            border: `1px solid ${colors.borderColor}`
                         }}>
                             <div style={{ display: 'flex' }}>
                                 <div style={{
                                     padding: '16px 16px',
-                                    backgroundColor: '#F2F2F7',
+                                    backgroundColor: colors.inputPrefix,
                                     fontFamily: 'SF Mono, Monaco, monospace',
                                     fontWeight: '600',
-                                    borderRight: '1px solid #E5E5EA',
-                                    color: '#3A3A3C',
+                                    borderRight: `1px solid ${colors.borderColor}`,
+                                    color: colors.textPrimary,
                                     fontSize: '17px'
                                 }}>
                                     +998
@@ -617,8 +743,8 @@ const App = () => {
                                         fontSize: '17px',
                                         border: 'none',
                                         outline: 'none',
-                                        backgroundColor: 'white',
-                                        color: '#000000'
+                                        backgroundColor: colors.inputBg,
+                                        color: colors.textPrimary
                                     }}
                                     placeholder="94 123 45 67"
                                     maxLength="12"
@@ -641,7 +767,39 @@ const App = () => {
                             color: status.type === 'success' ? '#0E7245' : 
                                    status.type === 'error' ? '#B03A2E' : '#1B4F72'
                         }}>
-                            {status.message}
+                            <div style={{ marginBottom: status.url ? '12px' : '0' }}>
+                                {status.message}
+                            </div>
+                            {status.url && (
+                                <a
+                                    href={status.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={handleVotingLinkClick}
+                                    style={{
+                                        display: 'inline-block',
+                                        backgroundColor: '#007AFF',
+                                        color: 'white',
+                                        textDecoration: 'none',
+                                        borderRadius: '12px',
+                                        padding: '12px 20px',
+                                        fontWeight: '600',
+                                        fontSize: '16px',
+                                        transition: 'all 0.2s ease',
+                                        cursor: 'pointer'
+                                    }}
+                                    onTouchStart={(e) => {
+                                        e.currentTarget.style.transform = 'scale(0.96)';
+                                        e.currentTarget.style.opacity = '0.8';
+                                    }}
+                                    onTouchEnd={(e) => {
+                                        e.currentTarget.style.transform = 'scale(1)';
+                                        e.currentTarget.style.opacity = '1';
+                                    }}
+                                >
+                                    🗳️ Ovoz berish
+                                </a>
+                            )}
                         </div>
                     )}
 
@@ -678,7 +836,7 @@ const App = () => {
                         <button
                             onClick={backToMain}
                             style={{
-                                backgroundColor: '#F2F2F7',
+                                backgroundColor: colors.activeBg,
                                 border: 'none',
                                 borderRadius: '14px',
                                 color: '#007AFF',
