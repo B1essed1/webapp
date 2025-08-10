@@ -155,6 +155,66 @@ const App = () => {
         }
     };
 
+    const handleReferralLink = () => {
+        const referralUrl = `https://t.me/o_budged_bot?start=${user.id}`;
+        
+        // Always copy to clipboard directly
+        copyToClipboard(referralUrl);
+    };
+
+    const copyToClipboard = (text) => {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+                if (tg?.showAlert) {
+                    tg.showAlert('Referal linkdan nusxa olindi');
+                } else {
+                    alert('Referal linkdan nusxa olindi');
+                }
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                fallbackCopyTextToClipboard(text);
+            });
+        } else {
+            fallbackCopyTextToClipboard(text);
+        }
+    };
+
+    const fallbackCopyTextToClipboard = (text) => {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                if (tg?.showAlert) {
+                    tg.showAlert('Referal linkdan nusxa olindi');
+                } else {
+                    alert('Referal linkdan nusxa olindi');
+                }
+            } else {
+                if (tg?.showAlert) {
+                    tg.showAlert(`Referal ssylka: https://t.me/o_budged_bot?start=${user.id}`);
+                } else {
+                    alert(`Referral link: https://t.me/o_budged_bot?start=${user.id}`);
+                }
+            }
+        } catch (err) {
+            if (tg?.showAlert) {
+                tg.showAlert(`Referal ssylka: https://t.me/o_budged_bot?start=${user.id}`);
+            } else {
+                alert(`Referral link: https://t.me/o_budged_bot?start=${user.id}`);
+            }
+        }
+        
+        document.body.removeChild(textArea);
+    };
+
     const showStatus = (message, type, url = null) => {
         setStatus({ message, type, show: true, url });
     };
@@ -631,7 +691,7 @@ const App = () => {
                                     justifyContent: 'space-between',
                                     cursor: 'pointer'
                                 }}
-                                onClick={comingSoon}
+                                onClick={handleReferralLink}
                                 onTouchStart={(e) => e.currentTarget.style.backgroundColor = colors.activeBg}
                                 onTouchEnd={(e) => e.currentTarget.style.backgroundColor = colors.cardBackground}
                             >
