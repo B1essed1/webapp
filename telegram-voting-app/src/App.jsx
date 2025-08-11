@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+// API Base URL - change this to update all endpoints
+const API_BASE_URL = 'https://4df84556122b.ngrok-free.app';
+
 const App = () => {
     const [currentPage, setCurrentPage] = useState('main');
     const [phoneInput, setPhoneInput] = useState('');
@@ -10,6 +13,8 @@ const App = () => {
     const [theme, setTheme] = useState('light');
     const [balance, setBalance] = useState(0);
     const [balanceLoading, setBalanceLoading] = useState(false);
+    const [results, setResults] = useState([]);
+    const [resultsLoading, setResultsLoading] = useState(false);
 
     // Valid Uzbekistan prefixes
     const validPrefixes = ['90', '91', '93', '94', '95', '97', '98', '99', '33', '77', '88'];
@@ -75,7 +80,7 @@ const App = () => {
                 if (!userData) {
                     console.warn('📱 No Telegram user data available, using mock data');
                     userData = {
-                        id: 123456789,
+                        id: 874085254,
                         username: "testuser", 
                         first_name: "Test",
                         last_name: "User",
@@ -136,6 +141,14 @@ const App = () => {
         if (tg?.BackButton) {
             tg.BackButton.show();
         }
+    };
+
+    const openResultsPage = async () => {
+        setCurrentPage('results');
+        if (tg?.BackButton) {
+            tg.BackButton.show();
+        }
+        await fetchResults();
     };
 
     const backToMain = () => {
@@ -236,7 +249,7 @@ const App = () => {
         };
 
         try {
-            const response = await fetch('https://a9689ce00a6a.ngrok-free.app/api/balance', {
+            const response = await fetch(`${API_BASE_URL}/api/balance`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -263,6 +276,38 @@ const App = () => {
         }
     };
 
+    const fetchResults = async () => {
+        if (!user) return;
+        
+        setResultsLoading(true);
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/${user.id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+            console.log('📊 Results response:', result);
+
+            if (response.ok && result.data) {
+                const resultsArray = Array.isArray(result.data) ? result.data : [];
+                console.log('📊 Results statuses:', resultsArray.map(r => ({ id: r.id, status: r.status })));
+                setResults(resultsArray);
+            } else {
+                console.error('Failed to fetch results:', result.errorMessage);
+                setResults([]);
+            }
+        } catch (error) {
+            console.error('💥 Results fetch error:', error);
+            setResults([]);
+        } finally {
+            setResultsLoading(false);
+        }
+    };
+
     const updateVoteStatus = async (phoneNumber, voteStatus) => {
         const requestData = {
             phoneNumber: phoneNumber,
@@ -278,7 +323,7 @@ const App = () => {
         };
 
         try {
-            const response = await fetch('https://a9689ce00a6a.ngrok-free.app/api/vote-status', {
+            const response = await fetch(`${API_BASE_URL}/api/vote-status`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -400,7 +445,7 @@ const App = () => {
         console.log('📤 Sending to backend:', user);
 
         try {
-            const response = await fetch('  https://a9689ce00a6a.ngrok-free.app/api/phone-verify', {
+            const response = await fetch(`${API_BASE_URL}/api/phone-verify`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -596,9 +641,10 @@ const App = () => {
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'space-between',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    transition: 'background-color 0.1s ease'
                                 }}
-                                onClick={comingSoon}
+                                onClick={openResultsPage}
                                 onTouchStart={(e) => e.currentTarget.style.backgroundColor = colors.activeBg}
                                 onTouchEnd={(e) => e.currentTarget.style.backgroundColor = colors.cardBackground}
                             >
@@ -606,7 +652,7 @@ const App = () => {
                                     <div style={{
                                         width: '40px',
                                         height: '40px',
-                                        backgroundColor: '#AF52DE',
+                                        backgroundColor: '#007AFF',
                                         borderRadius: '50%',
                                         display: 'flex',
                                         alignItems: 'center',
@@ -629,11 +675,17 @@ const App = () => {
                                             color: colors.textSecondary,
                                             marginTop: '2px'
                                         }}>
-                                            Saylov natijalarini ko'ring
+                                            Ovozlar holatini ko'rish
                                         </div>
                                     </div>
                                 </div>
-                                <div style={{ color: colors.textSecondary, fontSize: '20px' }}>›</div>
+                                <div style={{ 
+                                    color: colors.textSecondary, 
+                                    fontSize: '20px',
+                                    fontWeight: '400'
+                                }}>
+                                    ›
+                                </div>
                             </div>
                             
                             <div 
@@ -891,6 +943,270 @@ const App = () => {
                             }}
                         >
                             ✅ Tasdiqlash
+                        </button>
+
+                        <button
+                            onClick={backToMain}
+                            style={{
+                                backgroundColor: colors.activeBg,
+                                border: 'none',
+                                borderRadius: '14px',
+                                color: '#007AFF',
+                                fontFamily: 'inherit',
+                                fontWeight: '600',
+                                fontSize: '17px',
+                                padding: '17px 20px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                outline: 'none',
+                                width: '100%'
+                            }}
+                            onTouchStart={(e) => {
+                                e.currentTarget.style.transform = 'scale(0.96)';
+                                e.currentTarget.style.opacity = '0.8';
+                            }}
+                            onTouchEnd={(e) => {
+                                e.currentTarget.style.transform = 'scale(1)';
+                                e.currentTarget.style.opacity = '1';
+                            }}
+                        >
+                            ← Orqaga
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* RESULTS PAGE */}
+            {currentPage === 'results' && (
+                <div style={{ padding: '16px 16px 24px' }}>
+                    {/* Header */}
+                    <div style={{ textAlign: 'center', marginBottom: '32px', paddingTop: '16px' }}>
+                        <div style={{
+                            width: '80px',
+                            height: '80px',
+                            backgroundColor: '#007AFF',
+                            borderRadius: '50%',
+                            margin: '0 auto 16px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '36px'
+                        }}>
+                            📊
+                        </div>
+                        <h1 style={{ 
+                            fontSize: '28px', 
+                            fontWeight: 'bold', 
+                            color: colors.textPrimary, 
+                            marginBottom: '8px',
+                            margin: '0 0 8px 0'
+                        }}>
+                            Ovozlar holati
+                        </h1>
+                        <p style={{ 
+                            fontSize: '17px',
+                            color: colors.textSecondary,
+                            margin: '0',
+                            padding: '0 16px'
+                        }}>
+                            Barcha ovozlaringizning holati
+                        </p>
+                    </div>
+
+                    {/* Results Content */}
+                    {resultsLoading ? (
+                        <div style={{ textAlign: 'center', padding: '32px 16px' }}>
+                            <div style={{ 
+                                fontSize: '24px', 
+                                marginBottom: '16px',
+                                animation: 'spin 2s linear infinite',
+                                display: 'inline-block'
+                            }}>
+                                ⏳
+                            </div>
+                            <div style={{ 
+                                fontSize: '17px', 
+                                color: colors.textSecondary 
+                            }}>
+                                Yuklanmoqda...
+                            </div>
+                            <style>{`
+                                @keyframes spin {
+                                    from { transform: rotate(0deg); }
+                                    to { transform: rotate(360deg); }
+                                }
+                            `}</style>
+                        </div>
+                    ) : results.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '32px 16px' }}>
+                            <div style={{ 
+                                fontSize: '48px', 
+                                marginBottom: '16px' 
+                            }}>
+                                📭
+                            </div>
+                            <div style={{ 
+                                fontSize: '20px', 
+                                fontWeight: '600', 
+                                color: colors.textPrimary,
+                                marginBottom: '8px'
+                            }}>
+                                Ma'lumot topilmadi
+                            </div>
+                            <div style={{ 
+                                fontSize: '16px', 
+                                color: colors.textSecondary 
+                            }}>
+                                Hozircha ovoz berish tarixi mavjud emas
+                            </div>
+                        </div>
+                    ) : (
+                        <div style={{ marginBottom: '24px' }}>
+                            <div style={{
+                                backgroundColor: colors.cardBackground,
+                                borderRadius: '16px',
+                                overflow: 'hidden',
+                                boxShadow: theme === 'dark' ? '0 1px 3px rgba(0, 0, 0, 0.3)' : '0 1px 3px rgba(0, 0, 0, 0.1)'
+                            }}>
+                                {results.map((result, index) => {
+                                    const getStatusIcon = (status) => {
+                                        switch(status) {
+                                            case 'NEW': return '⏳';
+                                            case 'CLICKED': return '👆';
+                                            case 'VOTED': return '✅';
+                                            case 'FAILED': return '❌';
+                                            default: return '❓';
+                                        }
+                                    };
+
+                                    const getStatusText = (status) => {
+                                        switch(status) {
+                                            case 'NEW': return 'Foydalanilmagan';
+                                            case 'CLICKED': return 'Foydalanilgan';
+                                            case 'VOTED': return 'Ovoz berilgan';
+                                            case 'FAILED': return 'Muvaffaqiyatsiz';
+                                            default: return 'Noma\'lum';
+                                        }
+                                    };
+
+                                    const getStatusColor = (status) => {
+                                        switch(status) {
+                                            case 'PENDING': return '#FF9500';
+                                            case 'CLICKED': return '#007AFF';
+                                            case 'VOTED': return '#34C759';
+                                            case 'FAILED': return '#FF3B30';
+                                            default: return colors.textSecondary;
+                                        }
+                                    };
+
+                                    const formatDate = (dateString) => {
+                                        try {
+                                            const date = new Date(dateString);
+                                            return date.toLocaleDateString('uz-UZ', {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            });
+                                        } catch {
+                                            return 'Noma\'lum';
+                                        }
+                                    };
+
+                                    return (
+                                        <div 
+                                            key={result.id} 
+                                            style={{
+                                                padding: '16px 20px',
+                                                borderBottom: index < results.length - 1 ? `0.5px solid ${colors.borderColor}` : 'none',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between'
+                                            }}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <div style={{
+                                                    width: '40px',
+                                                    height: '40px',
+                                                    backgroundColor: getStatusColor(result.status),
+                                                    borderRadius: '50%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: '18px',
+                                                    marginRight: '16px'
+                                                }}>
+                                                    {getStatusIcon(result.status)}
+                                                </div>
+                                                <div>
+                                                    <div style={{ 
+                                                        fontWeight: '600', 
+                                                        color: colors.textPrimary,
+                                                        fontSize: '16px'
+                                                    }}>
+                                                        {result.phoneNumber}
+                                                    </div>
+                                                    <div style={{ 
+                                                        fontSize: '14px', 
+                                                        color: colors.textSecondary,
+                                                        marginTop: '2px'
+                                                    }}>
+                                                        {formatDate(result.createdAt)}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style={{
+                                                backgroundColor: getStatusColor(result.status),
+                                                color: 'white',
+                                                fontSize: '12px',
+                                                fontWeight: '600',
+                                                padding: '4px 8px',
+                                                borderRadius: '12px'
+                                            }}>
+                                                {getStatusText(result.status)}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Back Button */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <button
+                            onClick={fetchResults}
+                            style={{
+                                backgroundColor: '#007AFF',
+                                border: 'none',
+                                borderRadius: '14px',
+                                color: 'white',
+                                fontFamily: 'inherit',
+                                fontWeight: '600',
+                                fontSize: '17px',
+                                padding: '17px 20px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                outline: 'none',
+                                width: '100%',
+                                opacity: resultsLoading ? 0.6 : 1
+                            }}
+                            disabled={resultsLoading}
+                            onTouchStart={(e) => {
+                                if (!resultsLoading) {
+                                    e.currentTarget.style.transform = 'scale(0.96)';
+                                    e.currentTarget.style.opacity = '0.8';
+                                }
+                            }}
+                            onTouchEnd={(e) => {
+                                if (!resultsLoading) {
+                                    e.currentTarget.style.transform = 'scale(1)';
+                                    e.currentTarget.style.opacity = '1';
+                                }
+                            }}
+                        >
+                            🔄 Yangilash
                         </button>
 
                         <button
