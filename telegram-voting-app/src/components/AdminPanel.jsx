@@ -1,31 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import AdminLogin from './AdminLogin';
 import AdminDashboard from './AdminDashboard';
-import { API_BASE_URL } from '../constants';
+import { AdminAuth, AuthenticationError } from '../utils/adminAuth';
 
 const AdminPanel = ({ colors, theme }) => {
-    const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-    const [adminPassword, setAdminPassword] = useState('');
+    const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => AdminAuth.isAuthenticated());
     const [adminTab, setAdminTab] = useState('votes');
     const [allVotes, setAllVotes] = useState([]);
     const [allVotesLoading, setAllVotesLoading] = useState(false);
+    const [loginLoading, setLoginLoading] = useState(false);
+    const [loginError, setLoginError] = useState(null);
 
     const fetchAllVotes = async () => {
+        if (!AdminAuth.isAuthenticated()) {
+            setIsAdminAuthenticated(false);
+            return;
+        }
+
         setAllVotesLoading(true);
         
         try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/votes`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer admin:${adminPassword}`
-                }
+            const result = await AdminAuth.makeAuthenticatedRequest('/votes', {
+                method: 'GET'
             });
 
-            const result = await response.json();
             console.log('🔧 Admin votes response:', result);
 
-            if (response.ok && result.data) {
+            if (result.data) {
                 const votesArray = Array.isArray(result.data) ? result.data : [];
                 setAllVotes(votesArray);
             } else {
@@ -33,40 +34,53 @@ const AdminPanel = ({ colors, theme }) => {
                 setAllVotes([]);
             }
         } catch (error) {
-            console.error('💥 Admin votes fetch error:', error);
-            setAllVotes([]);
+            if (error instanceof AuthenticationError) {
+                setIsAdminAuthenticated(false);
+                setLoginError('Session expired. Please login again.');
+            } else {
+                console.error('💥 Admin votes fetch error:', error);
+                setAllVotes([]);
+            }
         } finally {
             setAllVotesLoading(false);
         }
     };
 
-    const handleAdminLogin = () => {
-        if (adminPassword === 'admin123') {
+    const handleAdminLogin = async (username, password) => {
+        setLoginLoading(true);
+        setLoginError(null);
+
+        try {
+            await AdminAuth.login(username, password);
             setIsAdminAuthenticated(true);
             fetchAllVotes();
-        } else {
-            alert('Invalid password');
+        } catch (error) {
+            console.error('💥 Admin login failed:', error);
+            setLoginError(error.message || 'Login failed');
+        } finally {
+            setLoginLoading(false);
         }
     };
 
     const handleLogout = () => {
+        AdminAuth.logout();
         setIsAdminAuthenticated(false);
-        setAdminPassword('');
         setAllVotes([]);
-        // Navigate back to main page
-        window.history.pushState(null, '', '/');
-        window.location.reload();
+        setLoginError(null);
+        // This will automatically show the login page since isAdminAuthenticated is now false
     };
 
     return (
-        <div style={{ padding: '16px', minHeight: '100vh' }}>
+        <div style={{ minHeight: '100vh' }}>
             {!isAdminAuthenticated ? (
-                <AdminLogin
-                    colors={colors}
-                    adminPassword={adminPassword}
-                    setAdminPassword={setAdminPassword}
-                    handleAdminLogin={handleAdminLogin}
-                />
+                <div style={{ padding: '16px' }}>
+                    <AdminLogin
+                        colors={colors}
+                        onLogin={handleAdminLogin}
+                        isLoading={loginLoading}
+                        error={loginError}
+                    />
+                </div>
             ) : (
                 <AdminDashboard
                     colors={colors}

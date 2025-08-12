@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import VotesTab from './VotesTab';
 import SettingsTab from './SettingsTab';
 
@@ -12,132 +12,303 @@ const AdminDashboard = ({
     fetchAllVotes, 
     handleLogout 
 }) => {
+    const [sidebarVisible, setSidebarVisible] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            const mobile = window.innerWidth < 768;
+            setIsMobile(mobile);
+            if (mobile) {
+                setSidebarVisible(false);
+            }
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const toggleSidebar = () => {
+        setSidebarVisible(!sidebarVisible);
+    };
+
     return (
-        <div>
-            {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <div style={{ 
+            display: 'flex', 
+            minHeight: '100vh',
+            backgroundColor: colors.pageBackground,
+            position: 'relative'
+        }}>
+            {/* Mobile Overlay */}
+            {isMobile && sidebarVisible && (
+                <div 
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        zIndex: 999,
+                        cursor: 'pointer'
+                    }}
+                    onClick={toggleSidebar}
+                />
+            )}
+
+            {/* Left Sidebar */}
+            <div style={{
+                width: isMobile ? '280px' : '280px',
+                backgroundColor: colors.cardBackground,
+                borderRight: `1px solid ${colors.borderColor}`,
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: theme === 'dark' ? '2px 0 8px rgba(0, 0, 0, 0.3)' : '2px 0 8px rgba(0, 0, 0, 0.1)',
+                position: isMobile ? 'fixed' : 'relative',
+                left: sidebarVisible ? '0' : (isMobile ? '-280px' : '-280px'),
+                height: isMobile ? '100vh' : 'auto',
+                zIndex: 1000,
+                transition: 'left 0.3s ease-in-out'
+            }}>
+                {/* Header */}
+                <div style={{ 
+                    padding: '24px 20px',
+                    borderBottom: `1px solid ${colors.borderColor}`
+                }}>
+                    <div style={{
+                        width: '48px',
+                        height: '48px',
+                        backgroundColor: '#FF3B30',
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '20px',
+                        marginBottom: '12px'
+                    }}>
+                        ⚙️
+                    </div>
+                    <h1 style={{
+                        fontSize: '20px',
+                        fontWeight: 'bold',
+                        color: colors.textPrimary,
+                        margin: '0 0 4px 0'
+                    }}>
+                        Admin Panel
+                    </h1>
+                    <p style={{
+                        fontSize: '14px',
+                        color: colors.textSecondary,
+                        margin: '0'
+                    }}>
+                        Voting System Management
+                    </p>
+                </div>
+
+                {/* Navigation Menu */}
+                <div style={{ padding: '16px 0', flex: 1 }}>
+                    <nav>
+                        <button
+                            onClick={() => {
+                                setAdminTab('votes');
+                                if (adminTab !== 'votes') {
+                                    fetchAllVotes();
+                                }
+                            }}
+                            style={{
+                                width: '100%',
+                                padding: '12px 20px',
+                                backgroundColor: adminTab === 'votes' ? 'rgba(0, 122, 255, 0.1)' : 'transparent',
+                                color: adminTab === 'votes' ? '#007AFF' : colors.textSecondary,
+                                border: 'none',
+                                borderLeft: adminTab === 'votes' ? '3px solid #007AFF' : '3px solid transparent',
+                                fontWeight: adminTab === 'votes' ? '600' : '500',
+                                fontSize: '15px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                textAlign: 'left',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (adminTab !== 'votes') {
+                                    e.currentTarget.style.backgroundColor = 'rgba(0, 122, 255, 0.05)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                if (adminTab !== 'votes') {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                }
+                            }}
+                        >
+                            <span style={{ fontSize: '16px' }}>📊</span>
+                            <span>Votes</span>
+                        </button>
+                        
+                        <button
+                            onClick={() => setAdminTab('settings')}
+                            style={{
+                                width: '100%',
+                                padding: '12px 20px',
+                                backgroundColor: adminTab === 'settings' ? 'rgba(0, 122, 255, 0.1)' : 'transparent',
+                                color: adminTab === 'settings' ? '#007AFF' : colors.textSecondary,
+                                border: 'none',
+                                borderLeft: adminTab === 'settings' ? '3px solid #007AFF' : '3px solid transparent',
+                                fontWeight: adminTab === 'settings' ? '600' : '500',
+                                fontSize: '15px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                textAlign: 'left',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (adminTab !== 'settings') {
+                                    e.currentTarget.style.backgroundColor = 'rgba(0, 122, 255, 0.05)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                if (adminTab !== 'settings') {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                }
+                            }}
+                        >
+                            <span style={{ fontSize: '16px' }}>⚙️</span>
+                            <span>Settings</span>
+                        </button>
+                    </nav>
+                </div>
+
+                {/* Logout Button */}
+                <div style={{ 
+                    padding: '16px 20px',
+                    borderTop: `1px solid ${colors.borderColor}`
+                }}>
+                    <button
+                        onClick={handleLogout}
+                        style={{
+                            width: '100%',
+                            backgroundColor: '#FF3B30',
+                            border: 'none',
+                            borderRadius: '8px',
+                            color: 'white',
+                            fontFamily: 'inherit',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            padding: '12px 16px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#D32F2F';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#FF3B30';
+                        }}
+                    >
+                        <span>🚪</span>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Main Content Area */}
+            <div style={{ 
+                flex: 1,
+                marginLeft: (!isMobile && !sidebarVisible) ? '-280px' : '0',
+                transition: 'margin-left 0.3s ease-in-out',
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: '100vh'
+            }}>
+                {/* Top Bar with Toggle Button */}
                 <div style={{
-                    width: '60px',
-                    height: '60px',
-                    backgroundColor: '#FF3B30',
-                    borderRadius: '50%',
-                    margin: '0 auto 12px',
+                    padding: '16px 24px',
+                    backgroundColor: colors.cardBackground,
+                    borderBottom: `1px solid ${colors.borderColor}`,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '24px'
+                    gap: '16px',
+                    boxShadow: theme === 'dark' ? '0 1px 3px rgba(0, 0, 0, 0.3)' : '0 1px 3px rgba(0, 0, 0, 0.1)'
                 }}>
-                    ⚙️
+                    <button
+                        onClick={toggleSidebar}
+                        style={{
+                            backgroundColor: 'transparent',
+                            border: `1px solid ${colors.borderColor}`,
+                            borderRadius: '8px',
+                            color: colors.textSecondary,
+                            padding: '8px',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '40px',
+                            height: '40px',
+                            transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+                            e.currentTarget.style.borderColor = colors.textSecondary;
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.borderColor = colors.borderColor;
+                        }}
+                        title={sidebarVisible ? "Hide sidebar" : "Show sidebar"}
+                    >
+                        {sidebarVisible ? '◀' : '▶'}
+                    </button>
+
+                    <div style={{
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        color: colors.textPrimary,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                    }}>
+                        <span style={{ fontSize: '20px' }}>
+                            {adminTab === 'votes' ? '📊' : '⚙️'}
+                        </span>
+                        <span>
+                            {adminTab === 'votes' ? 'Votes' : 'Settings'}
+                        </span>
+                    </div>
                 </div>
-                <h1 style={{
-                    fontSize: '24px',
-                    fontWeight: 'bold',
-                    color: colors.textPrimary,
-                    margin: '0 0 8px 0'
+
+                {/* Content Area */}
+                <div style={{
+                    flex: 1,
+                    padding: isMobile ? '16px' : '24px',
+                    overflow: 'auto'
                 }}>
-                    Admin Dashboard
-                </h1>
-                <p style={{
-                    fontSize: '15px',
-                    color: colors.textSecondary,
-                    margin: '0'
-                }}>
-                    Manage voting system
-                </p>
-            </div>
+                    {adminTab === 'votes' && (
+                        <VotesTab
+                            colors={colors}
+                            theme={theme}
+                            allVotes={allVotes}
+                            allVotesLoading={allVotesLoading}
+                            fetchAllVotes={fetchAllVotes}
+                        />
+                    )}
 
-            {/* Tab Navigation */}
-            <div style={{
-                display: 'flex',
-                backgroundColor: colors.cardBackground,
-                borderRadius: '12px',
-                padding: '4px',
-                marginBottom: '24px',
-                boxShadow: theme === 'dark' ? '0 1px 3px rgba(0, 0, 0, 0.3)' : '0 1px 3px rgba(0, 0, 0, 0.1)'
-            }}>
-                <button
-                    onClick={() => setAdminTab('votes')}
-                    style={{
-                        flex: '1',
-                        padding: '12px 16px',
-                        backgroundColor: adminTab === 'votes' ? '#007AFF' : 'transparent',
-                        color: adminTab === 'votes' ? 'white' : colors.textSecondary,
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontWeight: '600',
-                        fontSize: '15px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                    }}
-                >
-                    📊 Votes
-                </button>
-                <button
-                    onClick={() => setAdminTab('settings')}
-                    style={{
-                        flex: '1',
-                        padding: '12px 16px',
-                        backgroundColor: adminTab === 'settings' ? '#007AFF' : 'transparent',
-                        color: adminTab === 'settings' ? 'white' : colors.textSecondary,
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontWeight: '600',
-                        fontSize: '15px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                    }}
-                >
-                    ⚙️ Settings
-                </button>
-            </div>
-
-            {/* Tab Content */}
-            {adminTab === 'votes' && (
-                <VotesTab
-                    colors={colors}
-                    theme={theme}
-                    allVotes={allVotes}
-                    allVotesLoading={allVotesLoading}
-                    fetchAllVotes={fetchAllVotes}
-                />
-            )}
-
-            {adminTab === 'settings' && (
-                <SettingsTab
-                    colors={colors}
-                    theme={theme}
-                    allVotes={allVotes}
-                />
-            )}
-
-            {/* Logout Button */}
-            <div style={{ marginTop: '32px' }}>
-                <button
-                    onClick={handleLogout}
-                    style={{
-                        width: '100%',
-                        backgroundColor: '#FF3B30',
-                        border: 'none',
-                        borderRadius: '12px',
-                        color: 'white',
-                        fontFamily: 'inherit',
-                        fontWeight: '600',
-                        fontSize: '16px',
-                        padding: '16px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                    }}
-                    onTouchStart={(e) => {
-                        e.currentTarget.style.transform = 'scale(0.96)';
-                        e.currentTarget.style.opacity = '0.8';
-                    }}
-                    onTouchEnd={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)';
-                        e.currentTarget.style.opacity = '1';
-                    }}
-                >
-                    🚪 Logout
-                </button>
+                    {adminTab === 'settings' && (
+                        <SettingsTab
+                            colors={colors}
+                            theme={theme}
+                            allVotes={allVotes}
+                        />
+                    )}
+                </div>
             </div>
         </div>
     );

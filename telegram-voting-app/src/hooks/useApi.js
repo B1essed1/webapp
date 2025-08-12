@@ -29,7 +29,7 @@ export const useApi = (user) => {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/balance`, {
+      const response = await fetch(`${API_BASE_URL}/api/web/balance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -64,7 +64,7 @@ export const useApi = (user) => {
     setResultsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/${user.id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/web/${user.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -117,7 +117,7 @@ export const useApi = (user) => {
 
     console.log('📤 Sending to backend:', requestData);
 
-    const response = await fetch(`${API_BASE_URL}/api/phone-verify`, {
+    const response = await fetch(`${API_BASE_URL}/api/web/phone-verify`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -160,7 +160,7 @@ export const useApi = (user) => {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/vote-status`, {
+      const response = await fetch(`${API_BASE_URL}/api/web/vote-status`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

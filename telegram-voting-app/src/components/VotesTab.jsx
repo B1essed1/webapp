@@ -1,6 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const VotesTab = ({ colors, theme, allVotes, allVotesLoading, fetchAllVotes }) => {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
     const getStatusIcon = (status) => {
         switch(status) {
             case 'NEW': return '⏳';
@@ -117,73 +128,192 @@ const VotesTab = ({ colors, theme, allVotes, allVotesLoading, fetchAllVotes }) =
                         No voting data available yet
                     </div>
                 </div>
+            ) : isMobile ? (
+                // Mobile Card View
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {allVotes.map((vote) => (
+                        <div
+                            key={vote.id}
+                            style={{
+                                backgroundColor: colors.cardBackground,
+                                borderRadius: '12px',
+                                padding: '16px',
+                                boxShadow: theme === 'dark' ? '0 1px 3px rgba(0, 0, 0, 0.3)' : '0 1px 3px rgba(0, 0, 0, 0.1)',
+                                border: `1px solid ${colors.borderColor}`
+                            }}
+                        >
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-start',
+                                marginBottom: '12px'
+                            }}>
+                                <div style={{
+                                    fontSize: '14px',
+                                    color: colors.textSecondary,
+                                    fontFamily: 'monospace'
+                                }}>
+                                    #{vote.id}
+                                </div>
+                                <div style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    backgroundColor: getStatusColor(vote.status),
+                                    color: 'white',
+                                    fontSize: '11px',
+                                    fontWeight: '600',
+                                    padding: '3px 6px',
+                                    borderRadius: '6px'
+                                }}>
+                                    <span>{getStatusIcon(vote.status)}</span>
+                                    <span>{vote.status}</span>
+                                </div>
+                            </div>
+                            
+                            <div style={{
+                                fontSize: '16px',
+                                color: colors.textPrimary,
+                                fontWeight: '600',
+                                fontFamily: 'monospace',
+                                marginBottom: '8px'
+                            }}>
+                                {vote.phoneNumber}
+                            </div>
+                            
+                            <div style={{
+                                fontSize: '13px',
+                                color: colors.textSecondary,
+                                fontFamily: 'monospace'
+                            }}>
+                                {formatDate(vote.createdAt)}
+                            </div>
+                        </div>
+                    ))}
+                </div>
             ) : (
+                // Desktop Table View
                 <div style={{
                     backgroundColor: colors.cardBackground,
                     borderRadius: '12px',
                     overflow: 'hidden',
-                    boxShadow: theme === 'dark' ? '0 1px 3px rgba(0, 0, 0, 0.3)' : '0 1px 3px rgba(0, 0, 0, 0.1)'
+                    boxShadow: theme === 'dark' ? '0 1px 3px rgba(0, 0, 0, 0.3)' : '0 1px 3px rgba(0, 0, 0, 0.1)',
+                    overflowX: 'auto'
                 }}>
-                    {allVotes.map((vote, index) => (
-                        <div
-                            key={vote.id}
-                            style={{
-                                padding: '16px',
-                                borderBottom: index < allVotes.length - 1 ? `0.5px solid ${colors.borderColor}` : 'none',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between'
-                            }}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center', flex: '1' }}>
-                                <div style={{
-                                    width: '32px',
-                                    height: '32px',
-                                    backgroundColor: getStatusColor(vote.status),
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
+                    <table style={{
+                        width: '100%',
+                        borderCollapse: 'collapse',
+                        minWidth: '600px'
+                    }}>
+                        <thead>
+                            <tr style={{
+                                backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
+                                borderBottom: `1px solid ${colors.borderColor}`
+                            }}>
+                                <th style={{
+                                    padding: '16px',
+                                    textAlign: 'left',
+                                    fontWeight: '600',
                                     fontSize: '14px',
-                                    marginRight: '12px'
+                                    color: colors.textPrimary,
+                                    width: '80px'
                                 }}>
-                                    {getStatusIcon(vote.status)}
-                                </div>
-                                <div style={{ flex: '1' }}>
-                                    <div style={{
-                                        fontWeight: '600',
-                                        color: colors.textPrimary,
+                                    ID
+                                </th>
+                                <th style={{
+                                    padding: '16px',
+                                    textAlign: 'left',
+                                    fontWeight: '600',
+                                    fontSize: '14px',
+                                    color: colors.textPrimary,
+                                    minWidth: '150px'
+                                }}>
+                                    Phone Number
+                                </th>
+                                <th style={{
+                                    padding: '16px',
+                                    textAlign: 'left',
+                                    fontWeight: '600',
+                                    fontSize: '14px',
+                                    color: colors.textPrimary,
+                                    width: '120px'
+                                }}>
+                                    Status
+                                </th>
+                                <th style={{
+                                    padding: '16px',
+                                    textAlign: 'left',
+                                    fontWeight: '600',
+                                    fontSize: '14px',
+                                    color: colors.textPrimary,
+                                    minWidth: '180px'
+                                }}>
+                                    Created At
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {allVotes.map((vote, index) => (
+                                <tr
+                                    key={vote.id}
+                                    style={{
+                                        borderBottom: index < allVotes.length - 1 ? `1px solid ${colors.borderColor}` : 'none',
+                                        transition: 'background-color 0.2s ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.02)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
+                                >
+                                    <td style={{
+                                        padding: '16px',
                                         fontSize: '14px',
-                                        marginBottom: '2px'
+                                        color: colors.textSecondary,
+                                        fontFamily: 'monospace'
+                                    }}>
+                                        #{vote.id}
+                                    </td>
+                                    <td style={{
+                                        padding: '16px',
+                                        fontSize: '14px',
+                                        color: colors.textPrimary,
+                                        fontWeight: '500',
+                                        fontFamily: 'monospace'
                                     }}>
                                         {vote.phoneNumber}
-                                    </div>
-                                    <div style={{
-                                        fontSize: '12px',
-                                        color: colors.textSecondary
+                                    </td>
+                                    <td style={{
+                                        padding: '16px'
                                     }}>
-                                        User: {vote.telegramData?.firstName} (@{vote.telegramData?.username})
-                                    </div>
-                                    <div style={{
-                                        fontSize: '11px',
-                                        color: colors.textSecondary
+                                        <div style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '6px',
+                                            backgroundColor: getStatusColor(vote.status),
+                                            color: 'white',
+                                            fontSize: '12px',
+                                            fontWeight: '600',
+                                            padding: '4px 8px',
+                                            borderRadius: '6px'
+                                        }}>
+                                            <span>{getStatusIcon(vote.status)}</span>
+                                            <span>{vote.status}</span>
+                                        </div>
+                                    </td>
+                                    <td style={{
+                                        padding: '16px',
+                                        fontSize: '13px',
+                                        color: colors.textSecondary,
+                                        fontFamily: 'monospace'
                                     }}>
                                         {formatDate(vote.createdAt)}
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{
-                                backgroundColor: getStatusColor(vote.status),
-                                color: 'white',
-                                fontSize: '10px',
-                                fontWeight: '600',
-                                padding: '3px 6px',
-                                borderRadius: '8px'
-                            }}>
-                                {vote.status}
-                            </div>
-                        </div>
-                    ))}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             )}
         </div>

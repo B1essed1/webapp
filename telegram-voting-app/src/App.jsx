@@ -33,12 +33,12 @@ const App = () => {
     const api = useApi(user);
     
 
-    // Fetch balance when user becomes available
+    // Fetch balance when user becomes available (but not on admin page)
     useEffect(() => {
-        if (user) {
+        if (user && !navigation.isCurrentPage(ROUTES.ADMIN)) {
             api.fetchBalance();
         }
-    }, [user, api.fetchBalance]);
+    }, [user, api.fetchBalance, navigation]);
 
     // Event handlers
     const handleOpenPhonePage = useCallback(() => {

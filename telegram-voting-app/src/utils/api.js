@@ -22,7 +22,7 @@ export const createApiHeaders = (additionalHeaders = {}) => {
  * @returns {string} Complete API URL
  */
 export const createApiUrl = (endpoint) => {
-  return `${API_BASE_URL}/api${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  return `${API_BASE_URL}/api/web${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 };
 
 /**
