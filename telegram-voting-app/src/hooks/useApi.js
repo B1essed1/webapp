@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { API_BASE_URL, VOTE_STATUS } from '../constants';
 import { convertTiyinToSum } from '../utils';
 
@@ -10,14 +10,16 @@ import { convertTiyinToSum } from '../utils';
 export const useApi = (user) => {
   const [balance, setBalance] = useState(0);
   const [balanceLoading, setBalanceLoading] = useState(false);
+  const balanceFetchedRef = useRef(false);
   const [results, setResults] = useState([]);
   const [resultsLoading, setResultsLoading] = useState(false);
 
   /**
    * Fetches user balance from API
    */
-  const fetchBalance = useCallback(async () => {
+  const fetchBalance = useCallback(async (force = false) => {
     if (!user) return;
+    if (!force && balanceFetchedRef.current) return;
 
     setBalanceLoading(true);
     const requestData = {
@@ -43,13 +45,16 @@ export const useApi = (user) => {
       if (response.ok && result.data?.balance !== undefined) {
         const balanceInSum = convertTiyinToSum(result.data.balance);
         setBalance(balanceInSum);
+        balanceFetchedRef.current = true;
       } else {
         console.error('Failed to fetch balance:', result.errorMessage);
         setBalance(0);
+        balanceFetchedRef.current = true;
       }
     } catch (error) {
       console.error('💥 Balance fetch error:', error);
       setBalance(0);
+      balanceFetchedRef.current = true;
     } finally {
       setBalanceLoading(false);
     }

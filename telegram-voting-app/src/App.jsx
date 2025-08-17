@@ -25,6 +25,10 @@ import { ROUTES, VOTE_STATUS } from './constants';
  * Manages the overall state and routing for the Telegram voting application
  */
 const App = () => {
+    // Check if URL contains telegram/web for balance access
+    const currentUrl = window.location.href;
+    const isTelegramWeb = currentUrl.includes('telegram/web');
+    
     // Custom hooks for business logic
     const { tg, user, theme, isLoading: telegramLoading, showAlert, showBackButton, hideBackButton } = useTelegram();
     const navigation = useNavigation({ showBackButton, hideBackButton });
@@ -33,12 +37,12 @@ const App = () => {
     const api = useApi(user);
     
 
-    // Fetch balance when user becomes available (but not on admin page)
+    // Fetch balance when user becomes available (but not on admin page) and only for telegram/web URLs
     useEffect(() => {
-        if (user && !navigation.isCurrentPage(ROUTES.ADMIN)) {
+        if (user && !navigation.isCurrentPage(ROUTES.ADMIN) && isTelegramWeb) {
             api.fetchBalance();
         }
-    }, [user, api.fetchBalance, navigation]);
+    }, [user, isTelegramWeb]);
 
     // Event handlers
     const handleOpenPhonePage = useCallback(() => {
@@ -141,9 +145,9 @@ const App = () => {
             {navigation.isCurrentPage(ROUTES.MAIN) && (
                 <MainPage
                     user={user}
-                    balance={api.balance}
-                    balanceLoading={api.balanceLoading}
-                    onRefreshBalance={api.fetchBalance}
+                    balance={isTelegramWeb ? api.balance : null}
+                    balanceLoading={isTelegramWeb ? api.balanceLoading : false}
+                    onRefreshBalance={isTelegramWeb ? () => api.fetchBalance(true) : () => {}}
                     onNavigateToPhone={handleOpenPhonePage}
                     onNavigateToResults={handleOpenResultsPage}
                     onComingSoon={handleComingSoon}
