@@ -1,5 +1,5 @@
 // API Configuration
-export const API_BASE_URL = 'https://4974f8b4ddc8.ngrok-free.app';
+export const API_BASE_URL = 'https://8ee382baa6f6.ngrok-free.app';
 
 // Valid Uzbekistan mobile prefixes
 export const VALID_UZ_PREFIXES = ['90', '91', '93', '94', '95', '97', '98', '99', '33', '77', '88'];
