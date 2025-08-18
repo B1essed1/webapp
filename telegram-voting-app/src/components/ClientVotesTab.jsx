@@ -195,7 +195,7 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
                         letterSpacing: '-0.6px'
                     }}>
-                        Votes for {clientName}
+                        Ovozlar statistikasi - {clientName}
                     </h2>
                     <p style={{
                         fontSize: '15px',
