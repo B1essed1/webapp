@@ -9,17 +9,17 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Deploy to server
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.PRIVATE_KEY }}
-        port: ${{ secrets.PORT }}
-        script: |
-          cd /var/www/telegram-voting-app
-          git pull origin master
-          npm ci
-          npm run build
-          sudo systemctl restart telegram-voting-app.service
-          echo "Deployment completed!"
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /opt/front/webapp
+            git pull origin master
+            cd telegram-voting-app
+            npm ci
+            sudo systemctl restart telegram-voting-app.service
+            echo "Deployment completed!"
