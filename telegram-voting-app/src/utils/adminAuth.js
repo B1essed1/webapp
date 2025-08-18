@@ -105,7 +105,7 @@ export class AdminAuth {
     try {
       console.log('🔐 Making authenticated admin request to:', endpoint);
       
-      const response = await fetch(`${API_BASE_URL}/api/admin${endpoint}`, {
+      const response = await fetch(`${API_BASE_URL}/api${endpoint}`, {
         ...options,
         headers
       });

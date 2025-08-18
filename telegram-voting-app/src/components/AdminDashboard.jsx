@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import VotesTab from './VotesTab';
-import SettingsTab from './SettingsTab';
+import ClientsTab from './ClientsTab';
 
 const AdminDashboard = ({ 
     colors, 
     theme, 
     adminTab, 
     setAdminTab, 
-    allVotes, 
-    allVotesLoading, 
-    fetchAllVotes, 
     handleLogout 
 }) => {
     const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -60,161 +56,109 @@ const AdminDashboard = ({
             {/* Left Sidebar */}
             <div style={{
                 width: isMobile ? '280px' : '280px',
-                backgroundColor: colors.cardBackground,
-                borderRight: `1px solid ${colors.borderColor}`,
+                backgroundColor: theme === 'dark' ? 'rgba(28, 28, 30, 0.98)' : 'rgba(255, 255, 255, 0.98)',
+                borderRight: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
                 display: 'flex',
                 flexDirection: 'column',
-                boxShadow: theme === 'dark' ? '2px 0 8px rgba(0, 0, 0, 0.3)' : '2px 0 8px rgba(0, 0, 0, 0.1)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
                 position: isMobile ? 'fixed' : 'relative',
                 left: sidebarVisible ? '0' : (isMobile ? '-280px' : '-280px'),
                 height: isMobile ? '100vh' : 'auto',
                 zIndex: 1000,
-                transition: 'left 0.3s ease-in-out'
+                transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
             }}>
                 {/* Header */}
                 <div style={{ 
-                    padding: '24px 20px',
-                    borderBottom: `1px solid ${colors.borderColor}`
+                    padding: '32px 24px 24px 24px',
+                    borderBottom: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`
                 }}>
-                    <div style={{
-                        width: '48px',
-                        height: '48px',
-                        backgroundColor: '#FF3B30',
-                        borderRadius: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '20px',
-                        marginBottom: '12px'
-                    }}>
-                        ⚙️
-                    </div>
                     <h1 style={{
-                        fontSize: '20px',
-                        fontWeight: 'bold',
+                        fontSize: '24px',
+                        fontWeight: '600',
                         color: colors.textPrimary,
-                        margin: '0 0 4px 0'
+                        margin: '0 0 6px 0',
+                        letterSpacing: '-0.5px'
                     }}>
-                        Admin Panel
+                        Admin
                     </h1>
                     <p style={{
-                        fontSize: '14px',
+                        fontSize: '15px',
                         color: colors.textSecondary,
-                        margin: '0'
+                        margin: '0',
+                        fontWeight: '400'
                     }}>
-                        Voting System Management
+                        Manage clients and voting data
                     </p>
                 </div>
 
                 {/* Navigation Menu */}
-                <div style={{ padding: '16px 0', flex: 1 }}>
+                <div style={{ padding: '24px 0', flex: 1 }}>
                     <nav>
                         <button
-                            onClick={() => {
-                                setAdminTab('votes');
-                                if (adminTab !== 'votes') {
-                                    fetchAllVotes();
-                                }
-                            }}
+                            onClick={() => setAdminTab('clients')}
                             style={{
                                 width: '100%',
-                                padding: '12px 20px',
-                                backgroundColor: adminTab === 'votes' ? 'rgba(0, 122, 255, 0.1)' : 'transparent',
-                                color: adminTab === 'votes' ? '#007AFF' : colors.textSecondary,
+                                padding: '16px 24px',
+                                backgroundColor: adminTab === 'clients' ? (theme === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)') : 'transparent',
+                                color: adminTab === 'clients' ? colors.textPrimary : colors.textSecondary,
                                 border: 'none',
-                                borderLeft: adminTab === 'votes' ? '3px solid #007AFF' : '3px solid transparent',
-                                fontWeight: adminTab === 'votes' ? '600' : '500',
-                                fontSize: '15px',
+                                borderRadius: '0',
+                                fontWeight: adminTab === 'clients' ? '500' : '400',
+                                fontSize: '16px',
                                 cursor: 'pointer',
-                                transition: 'all 0.2s ease',
+                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                                 textAlign: 'left',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px'
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                letterSpacing: '-0.2px'
                             }}
                             onMouseEnter={(e) => {
-                                if (adminTab !== 'votes') {
-                                    e.currentTarget.style.backgroundColor = 'rgba(0, 122, 255, 0.05)';
+                                if (adminTab !== 'clients') {
+                                    e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)';
                                 }
                             }}
                             onMouseLeave={(e) => {
-                                if (adminTab !== 'votes') {
+                                if (adminTab !== 'clients') {
                                     e.currentTarget.style.backgroundColor = 'transparent';
                                 }
                             }}
                         >
-                            <span style={{ fontSize: '16px' }}>📊</span>
-                            <span>Votes</span>
-                        </button>
-                        
-                        <button
-                            onClick={() => setAdminTab('settings')}
-                            style={{
-                                width: '100%',
-                                padding: '12px 20px',
-                                backgroundColor: adminTab === 'settings' ? 'rgba(0, 122, 255, 0.1)' : 'transparent',
-                                color: adminTab === 'settings' ? '#007AFF' : colors.textSecondary,
-                                border: 'none',
-                                borderLeft: adminTab === 'settings' ? '3px solid #007AFF' : '3px solid transparent',
-                                fontWeight: adminTab === 'settings' ? '600' : '500',
-                                fontSize: '15px',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                textAlign: 'left',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px'
-                            }}
-                            onMouseEnter={(e) => {
-                                if (adminTab !== 'settings') {
-                                    e.currentTarget.style.backgroundColor = 'rgba(0, 122, 255, 0.05)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (adminTab !== 'settings') {
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                }
-                            }}
-                        >
-                            <span style={{ fontSize: '16px' }}>⚙️</span>
-                            <span>Settings</span>
+                            Clients
                         </button>
                     </nav>
                 </div>
 
                 {/* Logout Button */}
                 <div style={{ 
-                    padding: '16px 20px',
-                    borderTop: `1px solid ${colors.borderColor}`
+                    padding: '24px',
+                    borderTop: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`
                 }}>
                     <button
                         onClick={handleLogout}
                         style={{
                             width: '100%',
-                            backgroundColor: '#FF3B30',
-                            border: 'none',
+                            backgroundColor: 'transparent',
+                            border: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)'}`,
                             borderRadius: '8px',
-                            color: 'white',
-                            fontFamily: 'inherit',
-                            fontWeight: '600',
-                            fontSize: '14px',
+                            color: colors.textSecondary,
+                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                            fontWeight: '400',
+                            fontSize: '15px',
                             padding: '12px 16px',
                             cursor: 'pointer',
-                            transition: 'all 0.2s ease',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px'
+                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                            letterSpacing: '-0.2px'
                         }}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = '#D32F2F';
+                            e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)';
+                            e.currentTarget.style.borderColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
                         }}
                         onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = '#FF3B30';
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.borderColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)';
                         }}
                     >
-                        <span>🚪</span>
-                        <span>Logout</span>
+                        Sign Out
                     </button>
                 </div>
             </div>
@@ -230,58 +174,52 @@ const AdminDashboard = ({
             }}>
                 {/* Top Bar with Toggle Button */}
                 <div style={{
-                    padding: '16px 24px',
+                    padding: '20px 32px',
                     backgroundColor: colors.cardBackground,
-                    borderBottom: `1px solid ${colors.borderColor}`,
+                    borderBottom: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '16px',
-                    boxShadow: theme === 'dark' ? '0 1px 3px rgba(0, 0, 0, 0.3)' : '0 1px 3px rgba(0, 0, 0, 0.1)'
+                    gap: '20px',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)'
                 }}>
                     <button
                         onClick={toggleSidebar}
                         style={{
                             backgroundColor: 'transparent',
-                            border: `1px solid ${colors.borderColor}`,
+                            border: 'none',
                             borderRadius: '8px',
                             color: colors.textSecondary,
                             padding: '8px',
                             cursor: 'pointer',
-                            fontSize: '16px',
+                            fontSize: '14px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            width: '40px',
-                            height: '40px',
-                            transition: 'all 0.2s ease'
+                            width: '36px',
+                            height: '36px',
+                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif'
                         }}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
-                            e.currentTarget.style.borderColor = colors.textSecondary;
+                            e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)';
                         }}
                         onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = 'transparent';
-                            e.currentTarget.style.borderColor = colors.borderColor;
                         }}
                         title={sidebarVisible ? "Hide sidebar" : "Show sidebar"}
                     >
-                        {sidebarVisible ? '◀' : '▶'}
+                        {sidebarVisible ? '‹' : '›'}
                     </button>
 
                     <div style={{
-                        fontSize: '18px',
+                        fontSize: '20px',
                         fontWeight: '600',
                         color: colors.textPrimary,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
+                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                        letterSpacing: '-0.4px'
                     }}>
-                        <span style={{ fontSize: '20px' }}>
-                            {adminTab === 'votes' ? '📊' : '⚙️'}
-                        </span>
-                        <span>
-                            {adminTab === 'votes' ? 'Votes' : 'Settings'}
-                        </span>
+                        Clients
                     </div>
                 </div>
 
@@ -291,23 +229,10 @@ const AdminDashboard = ({
                     padding: isMobile ? '16px' : '24px',
                     overflow: 'auto'
                 }}>
-                    {adminTab === 'votes' && (
-                        <VotesTab
-                            colors={colors}
-                            theme={theme}
-                            allVotes={allVotes}
-                            allVotesLoading={allVotesLoading}
-                            fetchAllVotes={fetchAllVotes}
-                        />
-                    )}
-
-                    {adminTab === 'settings' && (
-                        <SettingsTab
-                            colors={colors}
-                            theme={theme}
-                            allVotes={allVotes}
-                        />
-                    )}
+                    <ClientsTab
+                        colors={colors}
+                        theme={theme}
+                    />
                 </div>
             </div>
         </div>

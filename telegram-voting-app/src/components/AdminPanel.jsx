@@ -5,46 +5,9 @@ import { AdminAuth, AuthenticationError } from '../utils/adminAuth';
 
 const AdminPanel = ({ colors, theme }) => {
     const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => AdminAuth.isAuthenticated());
-    const [adminTab, setAdminTab] = useState('votes');
-    const [allVotes, setAllVotes] = useState([]);
-    const [allVotesLoading, setAllVotesLoading] = useState(false);
+    const [adminTab, setAdminTab] = useState('clients');
     const [loginLoading, setLoginLoading] = useState(false);
     const [loginError, setLoginError] = useState(null);
-
-    const fetchAllVotes = async () => {
-        if (!AdminAuth.isAuthenticated()) {
-            setIsAdminAuthenticated(false);
-            return;
-        }
-
-        setAllVotesLoading(true);
-        
-        try {
-            const result = await AdminAuth.makeAuthenticatedRequest('/votes', {
-                method: 'GET'
-            });
-
-            console.log('🔧 Admin votes response:', result);
-
-            if (result.data) {
-                const votesArray = Array.isArray(result.data) ? result.data : [];
-                setAllVotes(votesArray);
-            } else {
-                console.error('Failed to fetch admin votes:', result.errorMessage);
-                setAllVotes([]);
-            }
-        } catch (error) {
-            if (error instanceof AuthenticationError) {
-                setIsAdminAuthenticated(false);
-                setLoginError('Session expired. Please login again.');
-            } else {
-                console.error('💥 Admin votes fetch error:', error);
-                setAllVotes([]);
-            }
-        } finally {
-            setAllVotesLoading(false);
-        }
-    };
 
     const handleAdminLogin = async (username, password) => {
         setLoginLoading(true);
@@ -53,7 +16,6 @@ const AdminPanel = ({ colors, theme }) => {
         try {
             await AdminAuth.login(username, password);
             setIsAdminAuthenticated(true);
-            fetchAllVotes();
         } catch (error) {
             console.error('💥 Admin login failed:', error);
             setLoginError(error.message || 'Login failed');
@@ -65,7 +27,6 @@ const AdminPanel = ({ colors, theme }) => {
     const handleLogout = () => {
         AdminAuth.logout();
         setIsAdminAuthenticated(false);
-        setAllVotes([]);
         setLoginError(null);
         // This will automatically show the login page since isAdminAuthenticated is now false
     };
@@ -87,9 +48,6 @@ const AdminPanel = ({ colors, theme }) => {
                     theme={theme}
                     adminTab={adminTab}
                     setAdminTab={setAdminTab}
-                    allVotes={allVotes}
-                    allVotesLoading={allVotesLoading}
-                    fetchAllVotes={fetchAllVotes}
                     handleLogout={handleLogout}
                 />
             )}
