@@ -1,0 +1,16 @@
+[Unit]
+Description=Telegram Voting App
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/telegram-voting-app
+ExecStart=/usr/bin/npm run preview
+Restart=always
+RestartSec=10
+Environment=NODE_ENV=production
+Environment=PORT=3000
+
+[Install]
+WantedBy=multi-user.target
