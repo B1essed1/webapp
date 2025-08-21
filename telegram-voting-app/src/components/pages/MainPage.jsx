@@ -13,6 +13,7 @@ import WithdrawalModal from '../common/WithdrawalModal';
  * @param {Function} props.onRefreshBalance - Balance refresh handler
  * @param {Function} props.onNavigateToPhone - Navigate to phone page handler
  * @param {Function} props.onNavigateToResults - Navigate to results page handler
+ * @param {Function} props.onNavigateToHistory - Navigate to payment history page handler
  * @param {Function} props.onComingSoon - Coming soon handler for disabled features
  * @param {Object} props.colors - Theme colors
  * @param {string} props.theme - Current theme
@@ -26,6 +27,7 @@ const MainPage = memo(({
   onRefreshBalance,
   onNavigateToPhone,
   onNavigateToResults,
+  onNavigateToHistory,
   onComingSoon,
   onWithdrawalRequest,
   colors,
@@ -99,7 +101,7 @@ const MainPage = memo(({
       title: 'To\'lovlar tarixi',
       description: 'Barcha tranzaksiyalar',
       backgroundColor: '#FF9500',
-      onClick: onComingSoon
+      onClick: onNavigateToHistory
     },
     {
       id: 'referral',

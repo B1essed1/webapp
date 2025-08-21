@@ -13,6 +13,8 @@ export const useApi = (user) => {
   const balanceFetchedRef = useRef(false);
   const [results, setResults] = useState([]);
   const [resultsLoading, setResultsLoading] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+  const [transactionsLoading, setTransactionsLoading] = useState(false);
 
   /**
    * Fetches user balance from API
@@ -234,12 +236,53 @@ export const useApi = (user) => {
     return result;
   }, [user]);
 
+  /**
+   * Fetches user transaction history
+   * @returns {Promise<void>}
+   */
+  const fetchTransactions = useCallback(async () => {
+    if (!user) return;
+
+    setTransactionsLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/transaction/users?userId=${user.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const result = await response.json();
+      console.log('💳 Transactions response:', result);
+
+      if (response.ok && result.data) {
+        // Convert amounts from tiyin to sum for display
+        const transactionsWithConvertedAmounts = result.data.content.map(transaction => ({
+          ...transaction,
+          amount: convertTiyinToSum(transaction.amount)
+        }));
+        setTransactions(transactionsWithConvertedAmounts);
+      } else {
+        console.error('Failed to fetch transactions:', result.errorMessage);
+        setTransactions([]);
+      }
+    } catch (error) {
+      console.error('💥 Transactions fetch error:', error);
+      setTransactions([]);
+    } finally {
+      setTransactionsLoading(false);
+    }
+  }, [user]);
+
   return {
     // State
     balance,
     balanceLoading,
     results,
     resultsLoading,
+    transactions,
+    transactionsLoading,
     
     // Actions
     fetchBalance,
@@ -247,5 +290,6 @@ export const useApi = (user) => {
     submitPhoneVerification,
     updateVoteStatus,
     requestTransaction,
+    fetchTransactions,
   };
 };
