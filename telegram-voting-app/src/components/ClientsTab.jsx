@@ -107,7 +107,8 @@ const ClientsTab = ({ colors, theme }) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'ngrok-skip-browser-warning': 'true'
                 },
                 body: JSON.stringify(clientData)
             });
@@ -153,7 +154,8 @@ const ClientsTab = ({ colors, theme }) => {
             const response = await fetch(`${API_BASE_URL}/api/client/status?id=${clientId}&status=${!currentStatus}`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'ngrok-skip-browser-warning': 'true'
                 }
             });
 

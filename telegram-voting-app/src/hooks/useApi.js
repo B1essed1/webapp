@@ -36,7 +36,8 @@ export const useApi = (user) => {
       const response = await fetch(`${API_BASE_URL}/api/web/balance`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'
         },
         body: JSON.stringify(requestData)
       });
@@ -74,7 +75,8 @@ export const useApi = (user) => {
       const response = await fetch(`${API_BASE_URL}/api/web/${user.id}`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'
         }
       });
 
@@ -127,7 +129,8 @@ export const useApi = (user) => {
     const response = await fetch(`${API_BASE_URL}/api/web/phone-verify`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true'
       },
       body: JSON.stringify(requestData)
     });
@@ -170,7 +173,8 @@ export const useApi = (user) => {
       const response = await fetch(`${API_BASE_URL}/api/web/vote-status`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'
         },
         body: JSON.stringify(requestData)
       });
@@ -221,7 +225,8 @@ export const useApi = (user) => {
     const response = await fetch(`${API_BASE_URL}/api/transaction/request`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true'
       },
       body: JSON.stringify(requestData)
     });
@@ -249,7 +254,8 @@ export const useApi = (user) => {
       const response = await fetch(`${API_BASE_URL}/api/transaction/users?userId=${user.id}`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'
         }
       });
 

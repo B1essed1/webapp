@@ -24,7 +24,8 @@ export class AdminAuth {
       const response = await fetch(`${API_BASE_URL}/api/admin/login`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'
         },
         body: JSON.stringify(requestData)
       });
@@ -88,6 +89,7 @@ export class AdminAuth {
     const token = this.getToken();
     return {
       'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
       ...(token && { 'Authorization': `Bearer ${token}` }),
       ...additionalHeaders
     };

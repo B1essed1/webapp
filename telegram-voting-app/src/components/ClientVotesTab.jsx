@@ -49,7 +49,8 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
             const response = await fetch(`${API_BASE_URL}/api/admin/votes?${params.toString()}`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'ngrok-skip-browser-warning': 'true'
                 }
             });
 
