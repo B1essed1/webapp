@@ -12,6 +12,7 @@ import { API_BASE_URL } from '../constants';
 export const createApiHeaders = (additionalHeaders = {}) => {
   return {
     'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
     ...additionalHeaders
   };
 };
