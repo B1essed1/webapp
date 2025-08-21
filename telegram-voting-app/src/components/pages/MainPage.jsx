@@ -1,7 +1,8 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { getCardShadow, getDeepCardShadow } from '../../utils/theme';
 import { BALANCE_CONFIG } from '../../constants';
 import { copyToClipboard } from '../../utils';
+import WithdrawalModal from '../common/WithdrawalModal';
 
 /**
  * Main page component displaying user balance and navigation menu
@@ -26,10 +27,41 @@ const MainPage = memo(({
   onNavigateToPhone,
   onNavigateToResults,
   onComingSoon,
+  onWithdrawalRequest,
   colors,
   theme,
   showAlert
 }) => {
+  const [isWithdrawalModalOpen, setIsWithdrawalModalOpen] = useState(false);
+  const [withdrawalLoading, setWithdrawalLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  
+  const handleWithdrawalSubmit = async (withdrawalData) => {
+    setWithdrawalLoading(true);
+    try {
+      const result = await onWithdrawalRequest(withdrawalData);
+      
+      // Close modal first
+      setIsWithdrawalModalOpen(false);
+      
+      // Show success message below balance
+      const message = result?.data?.message || 'Sizning so\'rovingiz qabul qilindi';
+      setSuccessMessage(message);
+      
+      // Hide message after 5 seconds
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 5000);
+      
+      // Refresh balance
+      onRefreshBalance(true);
+    } catch (error) {
+      showAlert(`Xatolik: ${error.message}`);
+    } finally {
+      setWithdrawalLoading(false);
+    }
+  };
+
   const handleReferralLink = () => {
     const referralUrl = `https://t.me/o_budged_bot?start=${user.id}`;
     
@@ -156,9 +188,62 @@ const MainPage = memo(({
             }}>
               {BALANCE_CONFIG.CURRENCY_DISPLAY}
             </div>
+            
+            {/* Withdrawal Button - Only show if balance > 0 */}
+            {!balanceLoading && balance > 0 && (
+              <button
+                onClick={() => setIsWithdrawalModalOpen(true)}
+                style={{
+                  marginTop: '16px',
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: '#28A745',
+                  color: 'white',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onTouchStart={(e) => {
+                  e.currentTarget.style.transform = 'scale(0.95)';
+                  e.currentTarget.style.backgroundColor = '#218838';
+                }}
+                onTouchEnd={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.backgroundColor = '#28A745';
+                }}
+              >
+                💰 Yechib olish
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Success Message */}
+      {successMessage && (
+        <div style={{ padding: '0 16px 16px' }}>
+          <div style={{
+            backgroundColor: '#D4F4DD',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            border: '1px solid #34C759',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <div style={{ fontSize: '18px' }}>✅</div>
+            <div style={{
+              fontSize: '15px',
+              fontWeight: '500',
+              color: '#1B5E20'
+            }}>
+              {successMessage}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Menu List */}
       <div style={{ padding: '0 16px' }}>
@@ -229,6 +314,17 @@ const MainPage = memo(({
           ))}
         </div>
       </div>
+      
+      {/* Withdrawal Modal */}
+      <WithdrawalModal
+        isOpen={isWithdrawalModalOpen}
+        onClose={() => setIsWithdrawalModalOpen(false)}
+        onSubmit={handleWithdrawalSubmit}
+        balance={balance}
+        colors={colors}
+        theme={theme}
+        loading={withdrawalLoading}
+      />
     </div>
   );
 });

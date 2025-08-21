@@ -126,6 +126,11 @@ const App = () => {
         }
     }, [phoneNumber.currentPhoneNumber, api, showSuccess]);
 
+    const handleWithdrawalRequest = useCallback(async (withdrawalData) => {
+        console.log('💸 [App] handleWithdrawalRequest called with:', withdrawalData);
+        return await api.requestTransaction(withdrawalData.cardNumber, withdrawalData.phoneNumber, withdrawalData.amount);
+    }, [api]);
+
     // Computed values
     const colors = getThemeColors(theme);
 
@@ -151,6 +156,7 @@ const App = () => {
                     onNavigateToPhone={handleOpenPhonePage}
                     onNavigateToResults={handleOpenResultsPage}
                     onComingSoon={handleComingSoon}
+                    onWithdrawalRequest={isTelegramWeb ? handleWithdrawalRequest : null}
                     colors={colors}
                     theme={theme}
                     showAlert={showAlert}

@@ -137,6 +137,24 @@ export const convertTiyinToSum = (balanceInTiyin) => {
 };
 
 /**
+ * Converts sum to tiyin
+ * @param {number} sumAmount - Amount in sum
+ * @returns {number} Amount in tiyin
+ */
+export const convertSumToTiyin = (sumAmount) => {
+  return sumAmount * BALANCE_CONFIG.TIYIN_TO_SUM_RATIO;
+};
+
+/**
+ * Formats amount for display with thousand separators
+ * @param {number} amount - Amount to format
+ * @returns {string} Formatted amount string
+ */
+export const formatAmount = (amount) => {
+  return new Intl.NumberFormat('uz-UZ').format(amount);
+};
+
+/**
  * Copies text to clipboard with fallback
  * @param {string} text - Text to copy
  * @param {Function} onSuccess - Success callback

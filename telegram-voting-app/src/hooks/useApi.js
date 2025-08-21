@@ -184,6 +184,56 @@ export const useApi = (user) => {
     }
   }, [user]);
 
+  /**
+   * Sends a transaction request
+   * @param {string} cardNumber - Card number for transaction
+   * @param {string} phoneNumber - Phone number for transaction
+   * @param {number} amount - Amount to withdraw
+   * @returns {Promise<Object>} API response
+   */
+  const requestTransaction = useCallback(async (cardNumber, phoneNumber, amount) => {
+    if (!user) {
+      throw new Error('User data not available');
+    }
+
+    // Determine transaction type based on which field is provided
+    const transactionType = cardNumber ? 'CARD' : 'PAYNET';
+    
+    const requestData = {
+      transactionType: transactionType,
+      cardNumber: cardNumber,
+      phoneNumber: phoneNumber,
+      amount: amount,
+      telegramData: {
+        userId: user.id,
+        chatId: user.chat_id,
+        username: user.username,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        languageCode: user.language_code
+      }
+    };
+
+    console.log('💸 Sending transaction request:', requestData);
+
+    const response = await fetch(`${API_BASE_URL}/api/transaction/request`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestData)
+    });
+
+    const result = await response.json();
+    console.log('💸 Transaction response:', result);
+
+    if (!response.ok) {
+      throw new Error(result.errorMessage || 'Transaction request failed');
+    }
+
+    return result;
+  }, [user]);
+
   return {
     // State
     balance,
@@ -196,5 +246,6 @@ export const useApi = (user) => {
     fetchResults,
     submitPhoneVerification,
     updateVoteStatus,
+    requestTransaction,
   };
 };
