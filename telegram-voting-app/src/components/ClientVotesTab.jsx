@@ -90,8 +90,8 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
         switch(status) {
             case 'NEW': return '⏳';
             case 'CLICKED': return '👆';
-            case 'VOTED': return '✅';
-            case 'FAILED': return '❌';
+            case 'SUCCESS': return '✅';
+            case 'CANCELLED': return '❌';
             default: return '❓';
         }
     };
@@ -100,8 +100,8 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
         switch(status) {
             case 'NEW': return '#FF9500';
             case 'CLICKED': return '#007AFF';
-            case 'VOTED': return '#34C759';
-            case 'FAILED': return '#FF3B30';
+            case 'SUCCESS': return '#34C759';
+            case 'CANCELLED': return '#FF3B30';
             default: return colors.textSecondary;
         }
     };
@@ -110,8 +110,8 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
         switch(status) {
             case 'NEW': return 'NEW';
             case 'CLICKED': return 'CLICKED';
-            case 'VOTED': return 'SUCCESS';
-            case 'FAILED': return 'CANCELLED';
+            case 'SUCCESS': return 'SUCCESS';
+            case 'CANCELLED': return 'CANCELLED';
             default: return status;
         }
     };
