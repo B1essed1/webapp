@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AdminAuth } from '../utils/adminAuth';
 import { API_BASE_URL } from '../constants';
+import { convertTiyinToSum, convertSumToTiyin } from '../utils';
 import ClientVotesTab from './ClientVotesTab';
 
 const ClientsTab = ({ colors, theme }) => {
@@ -98,8 +99,8 @@ const ClientsTab = ({ colors, theme }) => {
                 name: formData.name,
                 orderCount: parseInt(formData.orderCount) || 0,
                 link: formData.link,
-                amountPerVote: parseInt(formData.amountPerVote) || 0,
-                profitPerVote: parseInt(formData.profitPerVote) || 0
+                amountPerVote: convertSumToTiyin(parseFloat(formData.amountPerVote) || 0),
+                profitPerVote: convertSumToTiyin(parseFloat(formData.profitPerVote) || 0)
             };
 
             const token = AdminAuth.getToken();
@@ -206,6 +207,11 @@ const ClientsTab = ({ colors, theme }) => {
         } catch {
             return 'Unknown';
         }
+    };
+
+    const formatAmount = (amountInTiyin) => {
+        const amountInSom = convertTiyinToSum(amountInTiyin || 0);
+        return new Intl.NumberFormat('uz-UZ').format(amountInSom);
     };
 
     const filteredClients = clients.filter(client => {
@@ -778,7 +784,7 @@ const ClientsTab = ({ colors, theme }) => {
                                 color: colors.textSecondary,
                                 marginBottom: '4px'
                             }}>
-                                Orders: {client.orderCount} | Amount: {client.amountPerVote} | Profit: {client.profitPerVote}
+                                Orders: {client.orderCount} | Amount: {formatAmount(client.amountPerVote)} SO'M | Profit: {formatAmount(client.profitPerVote)} SO'M
                             </div>
                             
                             <div style={{
@@ -1008,9 +1014,9 @@ const ClientsTab = ({ colors, theme }) => {
                                             padding: '6px 10px',
                                             borderRadius: '8px',
                                             display: 'inline-block',
-                                            minWidth: '40px'
+                                            minWidth: '60px'
                                         }}>
-                                            {client.amountPerVote}
+                                            {formatAmount(client.amountPerVote)} SO'M
                                         </div>
                                     </td>
                                     <td style={{
@@ -1027,9 +1033,9 @@ const ClientsTab = ({ colors, theme }) => {
                                             padding: '6px 10px',
                                             borderRadius: '8px',
                                             display: 'inline-block',
-                                            minWidth: '40px'
+                                            minWidth: '60px'
                                         }}>
-                                            {client.profitPerVote}
+                                            {formatAmount(client.profitPerVote)} SO'M
                                         </div>
                                     </td>
                                     <td style={{

@@ -13,6 +13,11 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState('');
+    const [updatingVotes, setUpdatingVotes] = useState(new Set());
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
+    const [tempFromDate, setTempFromDate] = useState('');
+    const [tempToDate, setTempToDate] = useState('');
 
     useEffect(() => {
         const checkMobile = () => {
@@ -26,7 +31,7 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
 
     useEffect(() => {
         fetchClientVotes();
-    }, [currentPage, pageSize, statusFilter, searchQuery]);
+    }, [currentPage, pageSize, statusFilter, searchQuery, fromDate, toDate]);
 
     const fetchClientVotes = async () => {
         setVotesLoading(true);
@@ -43,6 +48,14 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
 
             if (searchQuery.trim()) {
                 params.append('search', searchQuery.trim());
+            }
+
+            if (fromDate) {
+                params.append('from', fromDate);
+            }
+
+            if (toDate) {
+                params.append('to', toDate);
             }
 
             const token = AdminAuth.getToken();
@@ -147,6 +160,39 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
         { value: 'SUCCESS', label: 'Voted' },
         { value: 'CANCELLED', label: 'Cancelled' }
     ];
+
+    const handleVoteUpdate = async (voteId, isSuccess) => {
+        setUpdatingVotes(prev => new Set([...prev, voteId]));
+        try {
+            const token = AdminAuth.getToken();
+            const response = await fetch(`${API_BASE_URL}/api/admin/update?id=${voteId}&isSuccess=${isSuccess}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'ngrok-skip-browser-warning': 'true'
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // Refresh the votes list to show updated status
+                await fetchClientVotes();
+            } else {
+                console.error('Failed to update vote:', result.errorMessage);
+                alert(`Failed to update vote: ${result.errorMessage || 'Unknown error'}`);
+            }
+        } catch (error) {
+            console.error('Error updating vote:', error);
+            alert('Failed to update vote. Please try again.');
+        } finally {
+            setUpdatingVotes(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(voteId);
+                return newSet;
+            });
+        }
+    };
 
     return (
         <div>
@@ -291,12 +337,83 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
                     </button>
                 </div>
 
-                {/* Status and Refresh */}
+                {/* Date Filters */}
                 <div style={{ 
                     display: 'flex', 
                     alignItems: 'center', 
-                    gap: '16px'
+                    gap: '12px',
+                    flexWrap: 'wrap'
                 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{
+                            fontSize: '14px',
+                            color: colors.textSecondary,
+                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                            fontWeight: '400'
+                        }}>
+                            From:
+                        </span>
+                        <input
+                            type="datetime-local"
+                            value={tempFromDate || fromDate}
+                            onChange={(e) => {
+                                setTempFromDate(e.target.value);
+                            }}
+                            onBlur={(e) => {
+                                setFromDate(e.target.value);
+                                setCurrentPage(0);
+                                setTempFromDate('');
+                            }}
+                            style={{
+                                padding: '8px 12px',
+                                border: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)'}`,
+                                borderRadius: '8px',
+                                backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.02)',
+                                color: colors.textPrimary,
+                                fontSize: '14px',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                outline: 'none',
+                                cursor: 'pointer',
+                                minWidth: '160px'
+                            }}
+                        />
+                    </div>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{
+                            fontSize: '14px',
+                            color: colors.textSecondary,
+                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                            fontWeight: '400'
+                        }}>
+                            To:
+                        </span>
+                        <input
+                            type="datetime-local"
+                            value={tempToDate || toDate}
+                            onChange={(e) => {
+                                setTempToDate(e.target.value);
+                            }}
+                            onBlur={(e) => {
+                                setToDate(e.target.value);
+                                setCurrentPage(0);
+                                setTempToDate('');
+                            }}
+                            style={{
+                                padding: '8px 12px',
+                                border: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)'}`,
+                                borderRadius: '8px',
+                                backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.02)',
+                                color: colors.textPrimary,
+                                fontSize: '14px',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                outline: 'none',
+                                cursor: 'pointer',
+                                minWidth: '160px'
+                            }}
+                        />
+                    </div>
+                    
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{
                             fontSize: '14px',
@@ -332,6 +449,43 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
                             ))}
                         </select>
                     </div>
+
+                    {(fromDate || toDate || statusFilter !== 'ALL' || searchQuery) && (
+                        <button
+                            onClick={() => {
+                                setFromDate('');
+                                setToDate('');
+                                setStatusFilter('ALL');
+                                setSearchQuery('');
+                                setSearchInput('');
+                                setCurrentPage(0);
+                            }}
+                            style={{
+                                backgroundColor: 'transparent',
+                                border: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)'}`,
+                                borderRadius: '8px',
+                                color: colors.textSecondary,
+                                padding: '8px 12px',
+                                fontSize: '13px',
+                                fontWeight: '500',
+                                cursor: 'pointer',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                letterSpacing: '-0.1px',
+                                whiteSpace: 'nowrap'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)';
+                                e.currentTarget.style.borderColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                                e.currentTarget.style.borderColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)';
+                            }}
+                        >
+                            Clear Filters
+                        </button>
+                    )}
 
                     <button
                         onClick={fetchClientVotes}
@@ -469,10 +623,85 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
                             <div style={{
                                 fontSize: '13px',
                                 color: colors.textSecondary,
-                                fontFamily: 'monospace'
+                                fontFamily: 'monospace',
+                                marginBottom: '12px'
                             }}>
                                 {formatDate(vote.createdAt)}
                             </div>
+                            
+                            {/* Action Buttons - Only show if status is not SUCCESS or CANCELLED */}
+                            {vote.status !== 'SUCCESS' && vote.status !== 'CANCELLED' && (
+                                <div style={{
+                                    display: 'flex',
+                                    gap: '8px',
+                                    marginTop: '12px'
+                                }}>
+                                    <button
+                                        onClick={() => handleVoteUpdate(vote.id, true)}
+                                        disabled={updatingVotes.has(vote.id)}
+                                        style={{
+                                            backgroundColor: '#34C759',
+                                            border: 'none',
+                                            borderRadius: '6px',
+                                            color: 'white',
+                                            padding: '6px 12px',
+                                            fontSize: '12px',
+                                            fontWeight: '600',
+                                            cursor: updatingVotes.has(vote.id) ? 'not-allowed' : 'pointer',
+                                            opacity: updatingVotes.has(vote.id) ? 0.6 : 1,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            flex: 1,
+                                            justifyContent: 'center',
+                                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (!updatingVotes.has(vote.id)) {
+                                                e.currentTarget.style.backgroundColor = '#2AAA4A';
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.backgroundColor = '#34C759';
+                                        }}
+                                    >
+                                        ✓ Accept
+                                    </button>
+                                    <button
+                                        onClick={() => handleVoteUpdate(vote.id, false)}
+                                        disabled={updatingVotes.has(vote.id)}
+                                        style={{
+                                            backgroundColor: '#FF3B30',
+                                            border: 'none',
+                                            borderRadius: '6px',
+                                            color: 'white',
+                                            padding: '6px 12px',
+                                            fontSize: '12px',
+                                            fontWeight: '600',
+                                            cursor: updatingVotes.has(vote.id) ? 'not-allowed' : 'pointer',
+                                            opacity: updatingVotes.has(vote.id) ? 0.6 : 1,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            flex: 1,
+                                            justifyContent: 'center',
+                                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (!updatingVotes.has(vote.id)) {
+                                                e.currentTarget.style.backgroundColor = '#D12B20';
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.backgroundColor = '#FF3B30';
+                                        }}
+                                    >
+                                        ✕ Reject
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -543,6 +772,18 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
                                 }}>
                                     Created At
                                 </th>
+                                <th style={{
+                                    padding: '18px 16px',
+                                    textAlign: 'center',
+                                    fontWeight: '700',
+                                    fontSize: '13px',
+                                    color: colors.textPrimary,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px',
+                                    minWidth: '200px'
+                                }}>
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -605,6 +846,91 @@ const ClientVotesTab = ({ colors, theme, clientId, clientName, onBack }) => {
                                         fontFamily: 'monospace'
                                     }}>
                                         {formatDate(vote.createdAt)}
+                                    </td>
+                                    <td style={{
+                                        padding: '16px',
+                                        textAlign: 'center'
+                                    }}>
+                                        {vote.status !== 'SUCCESS' && vote.status !== 'CANCELLED' ? (
+                                            <div style={{
+                                                display: 'flex',
+                                                gap: '8px',
+                                                justifyContent: 'center'
+                                            }}>
+                                                <button
+                                                    onClick={() => handleVoteUpdate(vote.id, true)}
+                                                    disabled={updatingVotes.has(vote.id)}
+                                                    style={{
+                                                        backgroundColor: '#34C759',
+                                                        border: 'none',
+                                                        borderRadius: '6px',
+                                                        color: 'white',
+                                                        padding: '6px 12px',
+                                                        fontSize: '12px',
+                                                        fontWeight: '600',
+                                                        cursor: updatingVotes.has(vote.id) ? 'not-allowed' : 'pointer',
+                                                        opacity: updatingVotes.has(vote.id) ? 0.6 : 1,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px',
+                                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                                        transition: 'all 0.2s ease',
+                                                        minWidth: '70px',
+                                                        justifyContent: 'center'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        if (!updatingVotes.has(vote.id)) {
+                                                            e.currentTarget.style.backgroundColor = '#2AAA4A';
+                                                        }
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.backgroundColor = '#34C759';
+                                                    }}
+                                                >
+                                                    ✓ Accept
+                                                </button>
+                                                <button
+                                                    onClick={() => handleVoteUpdate(vote.id, false)}
+                                                    disabled={updatingVotes.has(vote.id)}
+                                                    style={{
+                                                        backgroundColor: '#FF3B30',
+                                                        border: 'none',
+                                                        borderRadius: '6px',
+                                                        color: 'white',
+                                                        padding: '6px 12px',
+                                                        fontSize: '12px',
+                                                        fontWeight: '600',
+                                                        cursor: updatingVotes.has(vote.id) ? 'not-allowed' : 'pointer',
+                                                        opacity: updatingVotes.has(vote.id) ? 0.6 : 1,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px',
+                                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                                        transition: 'all 0.2s ease',
+                                                        minWidth: '70px',
+                                                        justifyContent: 'center'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        if (!updatingVotes.has(vote.id)) {
+                                                            e.currentTarget.style.backgroundColor = '#D12B20';
+                                                        }
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.backgroundColor = '#FF3B30';
+                                                    }}
+                                                >
+                                                    ✕ Reject
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div style={{
+                                                fontSize: '13px',
+                                                color: colors.textSecondary,
+                                                fontStyle: 'italic'
+                                            }}>
+                                                {vote.status === 'SUCCESS' ? 'Completed' : 'Cancelled'}
+                                            </div>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
