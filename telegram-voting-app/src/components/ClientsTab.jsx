@@ -494,7 +494,7 @@ const ClientsTab = ({ colors, theme }) => {
                                     color: colors.textPrimary,
                                     marginBottom: '6px'
                                 }}>
-                                    Order Count
+                                    To'plash kerak bo'lgan ovozlar soni
                                 </label>
                                 <input
                                     type="number"
@@ -555,7 +555,7 @@ const ClientsTab = ({ colors, theme }) => {
                                     color: colors.textPrimary,
                                     marginBottom: '6px'
                                 }}>
-                                    Amount Per Vote
+                                    Har bir ovoz uchun to'lov
                                 </label>
                                 <input
                                     type="number"
@@ -586,7 +586,7 @@ const ClientsTab = ({ colors, theme }) => {
                                     color: colors.textPrimary,
                                     marginBottom: '6px'
                                 }}>
-                                    Profit Per Vote
+                                    Referal link uchun to'lov
                                 </label>
                                 <input
                                     type="number"
@@ -862,7 +862,7 @@ const ClientsTab = ({ colors, theme }) => {
                                     width: '12%',
                                     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif'
                                 }}>
-                                    Amount
+                                    Har bir ovoz uchun
                                 </th>
                                 <th style={{
                                     padding: '18px 16px',
@@ -874,7 +874,7 @@ const ClientsTab = ({ colors, theme }) => {
                                     width: '12%',
                                     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif'
                                 }}>
-                                    Profit
+                                    Referal un to'lov
                                 </th>
                                 <th style={{
                                     padding: '18px 16px',

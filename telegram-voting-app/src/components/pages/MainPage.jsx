@@ -106,7 +106,7 @@ const MainPage = memo(({
     {
       id: 'referral',
       icon: '🔗',
-      title: 'Referal ssylka',
+      title: 'Do\'stingizni taklif qiling',
       description: 'Do\'stlarni taklif qiling',
       backgroundColor: '#5AC8FA',
       onClick: handleReferralLink
