@@ -9,6 +9,7 @@ export const ROUTES = {
     MAIN: 'main',
     PHONE: 'phone',
     RESULTS: 'results',
+    HISTORY: 'history',
     ADMIN: 'admin',
 };
 

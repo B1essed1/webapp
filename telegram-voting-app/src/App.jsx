@@ -6,6 +6,7 @@ import LoadingScreen from './components/common/LoadingScreen';
 import MainPage from './components/pages/MainPage';
 import PhonePage from './components/pages/PhonePage';
 import ResultsPage from './components/pages/ResultsPage';
+import PaymentHistoryPage from './components/pages/PaymentHistoryPage';
 
 // Hooks
 import { useTelegram } from './hooks/useTelegram';
@@ -57,6 +58,11 @@ const App = () => {
         navigation.navigateToResults();
         await api.fetchResults();
     }, [navigation, api]);
+
+    const handleOpenHistoryPage = useCallback(() => {
+        console.log('💆 [App] handleOpenHistoryPage called');
+        navigation.navigateToHistory();
+    }, [navigation]);
 
     const handleBackToMain = useCallback(() => {
         navigation.navigateToMain();
@@ -155,6 +161,7 @@ const App = () => {
                     onRefreshBalance={isTelegramWeb ? () => api.fetchBalance(true) : () => {}}
                     onNavigateToPhone={handleOpenPhonePage}
                     onNavigateToResults={handleOpenResultsPage}
+                    onNavigateToHistory={handleOpenHistoryPage}
                     onComingSoon={handleComingSoon}
                     onWithdrawalRequest={isTelegramWeb ? handleWithdrawalRequest : null}
                     colors={colors}
@@ -183,6 +190,18 @@ const App = () => {
                     results={api.results}
                     resultsLoading={api.resultsLoading}
                     onRefresh={api.fetchResults}
+                    onBack={handleBackToMain}
+                    colors={colors}
+                    theme={theme}
+                />
+            )}
+
+            {/* PAYMENT HISTORY PAGE */}
+            {navigation.isCurrentPage(ROUTES.HISTORY) && (
+                <PaymentHistoryPage
+                    transactions={api.transactions}
+                    transactionsLoading={api.transactionsLoading}
+                    onFetchTransactions={api.fetchTransactions}
                     onBack={handleBackToMain}
                     colors={colors}
                     theme={theme}

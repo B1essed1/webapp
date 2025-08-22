@@ -40,6 +40,15 @@ export const useNavigation = (telegram) => {
   }, [telegram]);
 
   /**
+   * Navigates to payment history page
+   */
+  const navigateToHistory = useCallback(() => {
+    console.log('🧠 [useNavigation] Navigating to history');
+    setCurrentPage(ROUTES.HISTORY);
+    telegram?.showBackButton?.();
+  }, [telegram]);
+
+  /**
    * Navigates to admin page
    */
   const navigateToAdmin = useCallback(() => {
@@ -75,6 +84,7 @@ export const useNavigation = (telegram) => {
     navigateToMain,
     navigateToPhone,
     navigateToResults,
+    navigateToHistory,
     navigateToAdmin,
     isCurrentPage,
   };
