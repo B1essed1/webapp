@@ -209,7 +209,25 @@ const fallbackCopyTextToClipboard = (text, onSuccess, onError) => {
  * @returns {boolean} True if on admin route
  */
 export const isAdminRoute = () => {
-  return window.location.pathname === '/admin' || window.location.hash === '#admin';
+  console.log('🔍 [isAdminRoute] Checking route:', {
+    pathname: window.location.pathname,
+    search: window.location.search,
+    hash: window.location.hash,
+    href: window.location.href
+  });
+  
+  // Never allow admin access in Telegram Web
+  if (window.location.href.includes('telegram/web')) {
+    console.log('🔍 [isAdminRoute] Telegram Web detected, blocking admin access');
+    return false;
+  }
+  
+  // Only allow admin access via explicit URL parameters, not hash fragments
+  const urlParams = new URLSearchParams(window.location.search);
+  const isAdmin = window.location.pathname === '/admin' || urlParams.get('admin') === 'true';
+  
+  console.log('🔍 [isAdminRoute] Result:', isAdmin);
+  return isAdmin;
 };
 
 /**
