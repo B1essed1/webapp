@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ClientsTab from './ClientsTab';
 import TransactionTab from './TransactionTab';
 import SendMessageTab from './SendMessageTab';
+import StatisticsTab from './StatisticsTab';
 
 const AdminDashboard = ({ 
     colors, 
@@ -187,6 +188,36 @@ const AdminDashboard = ({
                         >
                             Send Message
                         </button>
+                        <button
+                            onClick={() => setAdminTab('statistics')}
+                            style={{
+                                width: '100%',
+                                padding: '16px 24px',
+                                backgroundColor: adminTab === 'statistics' ? (theme === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)') : 'transparent',
+                                color: adminTab === 'statistics' ? colors.textPrimary : colors.textSecondary,
+                                border: 'none',
+                                borderRadius: '0',
+                                fontWeight: adminTab === 'statistics' ? '500' : '400',
+                                fontSize: '16px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                textAlign: 'left',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                letterSpacing: '-0.2px'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (adminTab !== 'statistics') {
+                                    e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                if (adminTab !== 'statistics') {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                }
+                            }}
+                        >
+                            Statistics
+                        </button>
                     </nav>
                 </div>
 
@@ -281,7 +312,9 @@ const AdminDashboard = ({
                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
                         letterSpacing: '-0.4px'
                     }}>
-                        {adminTab === 'transactions' ? 'Transactions' : adminTab === 'send-message' ? 'Send Message' : 'Clients'}
+                        {adminTab === 'transactions' ? 'Transactions' : 
+                         adminTab === 'send-message' ? 'Send Message' : 
+                         adminTab === 'statistics' ? 'Statistics' : 'Clients'}
                     </div>
                 </div>
 
@@ -298,6 +331,11 @@ const AdminDashboard = ({
                         />
                     ) : adminTab === 'send-message' ? (
                         <SendMessageTab
+                            colors={colors}
+                            theme={theme}
+                        />
+                    ) : adminTab === 'statistics' ? (
+                        <StatisticsTab
                             colors={colors}
                             theme={theme}
                         />
