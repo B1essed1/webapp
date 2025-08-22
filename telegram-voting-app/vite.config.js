@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     host: true,
     allowedHosts: [
+        'https://concert-injury-iii-reasons.trycloudflare.com',
       'localhost',
       '.ngrok-free.app',
       '.ngrok.io'
