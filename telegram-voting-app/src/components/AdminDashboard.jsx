@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ClientsTab from './ClientsTab';
+import TransactionTab from './TransactionTab';
 
 const AdminDashboard = ({ 
     colors, 
@@ -125,6 +126,36 @@ const AdminDashboard = ({
                         >
                             Clients
                         </button>
+                        <button
+                            onClick={() => setAdminTab('transactions')}
+                            style={{
+                                width: '100%',
+                                padding: '16px 24px',
+                                backgroundColor: adminTab === 'transactions' ? (theme === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)') : 'transparent',
+                                color: adminTab === 'transactions' ? colors.textPrimary : colors.textSecondary,
+                                border: 'none',
+                                borderRadius: '0',
+                                fontWeight: adminTab === 'transactions' ? '500' : '400',
+                                fontSize: '16px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                textAlign: 'left',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                letterSpacing: '-0.2px'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (adminTab !== 'transactions') {
+                                    e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                if (adminTab !== 'transactions') {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                }
+                            }}
+                        >
+                            Transactions
+                        </button>
                     </nav>
                 </div>
 
@@ -219,7 +250,7 @@ const AdminDashboard = ({
                         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
                         letterSpacing: '-0.4px'
                     }}>
-                        Clients
+                        {adminTab === 'transactions' ? 'Transactions' : 'Clients'}
                     </div>
                 </div>
 
@@ -229,10 +260,17 @@ const AdminDashboard = ({
                     padding: isMobile ? '16px' : '24px',
                     overflow: 'auto'
                 }}>
-                    <ClientsTab
-                        colors={colors}
-                        theme={theme}
-                    />
+                    {adminTab === 'transactions' ? (
+                        <TransactionTab
+                            colors={colors}
+                            theme={theme}
+                        />
+                    ) : (
+                        <ClientsTab
+                            colors={colors}
+                            theme={theme}
+                        />
+                    )}
                 </div>
             </div>
         </div>
