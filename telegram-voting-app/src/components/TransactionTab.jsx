@@ -686,49 +686,60 @@ const TransactionTab = ({ colors, theme }) => {
                                 {formatDate(transaction.updatedAt || transaction.updatedDate || transaction.createdDate)}
                             </div>
                             
-                            <div style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '6px',
-                                alignItems: 'flex-end'
-                            }}>
-                                <button
-                                    onClick={() => updateTransactionState(transaction.id, false)}
-                                    style={{
-                                        backgroundColor: '#FF3B30',
-                                        border: 'none',
-                                        borderRadius: '6px',
-                                        color: 'white',
-                                        padding: '8px 12px',
-                                        fontSize: '12px',
-                                        fontWeight: '600',
-                                        cursor: 'pointer',
-                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
-                                        transition: 'all 0.2s ease',
-                                        letterSpacing: '-0.1px'
-                                    }}
-                                >
-                                    Reject
-                                </button>
-                                <button
-                                    onClick={() => updateTransactionState(transaction.id, true)}
-                                    style={{
-                                        backgroundColor: '#34C759',
-                                        border: 'none',
-                                        borderRadius: '6px',
-                                        color: 'white',
-                                        padding: '8px 12px',
-                                        fontSize: '12px',
-                                        fontWeight: '600',
-                                        cursor: 'pointer',
-                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
-                                        transition: 'all 0.2s ease',
-                                        letterSpacing: '-0.1px'
-                                    }}
-                                >
-                                    Approve
-                                </button>
-                            </div>
+                            {transaction.status?.toLowerCase() === 'in_process' ? (
+                                <div style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '6px',
+                                    alignItems: 'flex-end'
+                                }}>
+                                    <button
+                                        onClick={() => updateTransactionState(transaction.id, false)}
+                                        style={{
+                                            backgroundColor: '#FF3B30',
+                                            border: 'none',
+                                            borderRadius: '6px',
+                                            color: 'white',
+                                            padding: '8px 12px',
+                                            fontSize: '12px',
+                                            fontWeight: '600',
+                                            cursor: 'pointer',
+                                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                            transition: 'all 0.2s ease',
+                                            letterSpacing: '-0.1px'
+                                        }}
+                                    >
+                                        Reject
+                                    </button>
+                                    <button
+                                        onClick={() => updateTransactionState(transaction.id, true)}
+                                        style={{
+                                            backgroundColor: '#34C759',
+                                            border: 'none',
+                                            borderRadius: '6px',
+                                            color: 'white',
+                                            padding: '8px 12px',
+                                            fontSize: '12px',
+                                            fontWeight: '600',
+                                            cursor: 'pointer',
+                                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                            transition: 'all 0.2s ease',
+                                            letterSpacing: '-0.1px'
+                                        }}
+                                    >
+                                        Approve
+                                    </button>
+                                </div>
+                            ) : (
+                                <div style={{
+                                    color: colors.textSecondary,
+                                    fontSize: '12px',
+                                    fontStyle: 'italic',
+                                    textAlign: 'right'
+                                }}>
+                                    No actions available
+                                </div>
+                            )}
                         </div>
                     ))}
                     {renderPagination()}
@@ -975,66 +986,76 @@ const TransactionTab = ({ colors, theme }) => {
                                             textAlign: 'center',
                                             verticalAlign: 'middle'
                                         }}>
-                                            <div style={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                gap: '6px',
-                                                justifyContent: 'center',
-                                                alignItems: 'center'
-                                            }}>
-                                                <button
-                                                    onClick={() => updateTransactionState(transaction.id, false)}
-                                                    style={{
-                                                        backgroundColor: '#FF3B30',
-                                                        border: 'none',
-                                                        borderRadius: '6px',
-                                                        color: 'white',
-                                                        padding: '6px 12px',
-                                                        fontSize: '12px',
-                                                        fontWeight: '600',
-                                                        cursor: 'pointer',
-                                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
-                                                        transition: 'all 0.2s ease',
-                                                        letterSpacing: '-0.1px'
-                                                    }}
-                                                    onMouseEnter={(e) => {
-                                                        e.currentTarget.style.backgroundColor = '#D70015';
-                                                        e.currentTarget.style.transform = 'translateY(-1px)';
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        e.currentTarget.style.backgroundColor = '#FF3B30';
-                                                        e.currentTarget.style.transform = 'translateY(0)';
-                                                    }}
-                                                >
-                                                    Reject
-                                                </button>
-                                                <button
-                                                    onClick={() => updateTransactionState(transaction.id, true)}
-                                                    style={{
-                                                        backgroundColor: '#34C759',
-                                                        border: 'none',
-                                                        borderRadius: '6px',
-                                                        color: 'white',
-                                                        padding: '6px 12px',
-                                                        fontSize: '12px',
-                                                        fontWeight: '600',
-                                                        cursor: 'pointer',
-                                                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
-                                                        transition: 'all 0.2s ease',
-                                                        letterSpacing: '-0.1px'
-                                                    }}
-                                                    onMouseEnter={(e) => {
-                                                        e.currentTarget.style.backgroundColor = '#248A3D';
-                                                        e.currentTarget.style.transform = 'translateY(-1px)';
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        e.currentTarget.style.backgroundColor = '#34C759';
-                                                        e.currentTarget.style.transform = 'translateY(0)';
-                                                    }}
-                                                >
-                                                    Approve
-                                                </button>
-                                            </div>
+                                            {transaction.status?.toLowerCase() === 'in_process' ? (
+                                                <div style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    gap: '6px',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center'
+                                                }}>
+                                                    <button
+                                                        onClick={() => updateTransactionState(transaction.id, false)}
+                                                        style={{
+                                                            backgroundColor: '#FF3B30',
+                                                            border: 'none',
+                                                            borderRadius: '6px',
+                                                            color: 'white',
+                                                            padding: '6px 12px',
+                                                            fontSize: '12px',
+                                                            fontWeight: '600',
+                                                            cursor: 'pointer',
+                                                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                                            transition: 'all 0.2s ease',
+                                                            letterSpacing: '-0.1px'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.backgroundColor = '#D70015';
+                                                            e.currentTarget.style.transform = 'translateY(-1px)';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.backgroundColor = '#FF3B30';
+                                                            e.currentTarget.style.transform = 'translateY(0)';
+                                                        }}
+                                                    >
+                                                        Reject
+                                                    </button>
+                                                    <button
+                                                        onClick={() => updateTransactionState(transaction.id, true)}
+                                                        style={{
+                                                            backgroundColor: '#34C759',
+                                                            border: 'none',
+                                                            borderRadius: '6px',
+                                                            color: 'white',
+                                                            padding: '6px 12px',
+                                                            fontSize: '12px',
+                                                            fontWeight: '600',
+                                                            cursor: 'pointer',
+                                                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                                                            transition: 'all 0.2s ease',
+                                                            letterSpacing: '-0.1px'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.backgroundColor = '#248A3D';
+                                                            e.currentTarget.style.transform = 'translateY(-1px)';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.backgroundColor = '#34C759';
+                                                            e.currentTarget.style.transform = 'translateY(0)';
+                                                        }}
+                                                    >
+                                                        Approve
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div style={{
+                                                    color: colors.textSecondary,
+                                                    fontSize: '12px',
+                                                    fontStyle: 'italic'
+                                                }}>
+                                                    No actions available
+                                                </div>
+                                            )}
                                         </td>
                                     </tr>
                                 ))}
