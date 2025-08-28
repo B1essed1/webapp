@@ -120,7 +120,8 @@ export const formatDate = (dateString, locale = 'uz-UZ') => {
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      hour12: false
     });
   } catch {
     return locale === 'uz-UZ' ? 'Noma\'lum' : 'Unknown';

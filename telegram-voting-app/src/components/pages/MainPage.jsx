@@ -65,7 +65,7 @@ const MainPage = memo(({
   };
 
   const handleReferralLink = () => {
-    const referralUrl = `https://t.me/o_budged_bot?start=${user.id}`;
+    const referralUrl = `https://t.me/kelajak_openbot?start=${user.id}`;
     
     copyToClipboard(
       referralUrl,
