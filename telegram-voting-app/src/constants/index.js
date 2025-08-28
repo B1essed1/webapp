@@ -1,5 +1,5 @@
 // API Configuration
-export const API_BASE_URL = 'https://friend-quarter-books-discipline.trycloudflare.com';
+export const API_BASE_URL = 'https://features-sucking-mass-tracking.trycloudflare.com';
 
 // Valid Uzbekistan mobile prefixes
 export const VALID_UZ_PREFIXES = ['90', '91', '93', '94', '95', '97', '98', '99', '33', '77', '88'];
